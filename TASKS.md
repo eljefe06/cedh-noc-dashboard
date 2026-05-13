@@ -52,8 +52,8 @@
 - [x] Esperar que termine actualización de Android
 - [x] Play Store → instalar Tailscale Android
 - [x] Login con mismo usuario que VPS-MyRock
-- [ ] Verificar que Tab A8 aparece en el dashboard de Tailscale
-- [ ] Probar abrir `http://100.104.244.83:8080` desde Tab A8
+- [x] Tab A8 aparece en tailnet → `galaxy-tab-a8` / `100.121.75.52`
+- [x] Dashboard visible desde Tab A8 en `http://100.104.244.83:8080` ✅
 
 ### 0.5 Inicializar repositorio
 
@@ -252,12 +252,12 @@
 
 ### 4.2 SSH desde VPS-MyRock hacia los otros 3
 
-- [ ] Generar llave dedicada `noc_collector_ed25519` en VPS-MyRock
-- [ ] Copiar llave pública a VPS-SUIG `authorized_keys`
-- [ ] Copiar llave pública a VPS-OIC `authorized_keys`
-- [ ] Copiar llave pública a VPS-Mail `authorized_keys`
-- [ ] Configurar SSH config con ControlMaster (ver `docs/SECURITY.md`)
-- [ ] Probar `ssh suig-vps "uptime"` sin password ni prompt
+- [x] Generar llave dedicada `noc_collector_ed25519` en VPS-MyRock
+- [x] Copiar llave pública a VPS-SUIG `authorized_keys` (root@187.124.152.86) ✅
+- [x] Copiar llave pública a VPS-OIC `authorized_keys` (root@31.220.58.97) ✅
+- [x] Copiar llave pública a VPS-Mail `authorized_keys` (jyanagui@100.118.231.85 via Tailscale) ✅
+- [x] Probar SSH desde VPS-MyRock → 3/3 OK
+- [ ] Configurar SSH config con ControlMaster en VPS-MyRock
 
 ### 4.3 Discovery en VPS-SUIG
 
@@ -460,9 +460,9 @@ Ver `docs/SECURITY.md` sección "Checklist de seguridad pre-producción".
 
 > Cosas que impiden avanzar. Resolver antes de progresar.
 
-- [ ] **Deploy Phase 3 backend pendiente** — `git pull + docker compose up --build` en VPS-MyRock para levantar `noc-api`
-- [ ] **No confirmados los dominios reales de servicios OIC** — bloquea Fase 5.2 para algunos servicios
+- [ ] **Dominios OIC no confirmados** (declaraciones, denuncias, ser-cedh) — bloquea Fase 5.2 para esos servicios
 - [ ] **No confirmado si `/health` existe en cada sistema** — puede bloquear Fase 4.6
+- [ ] **SERVERS_CONFIG en .env** del VPS necesita actualizarse con IPs/users reales antes de Phase 5
 
 ---
 

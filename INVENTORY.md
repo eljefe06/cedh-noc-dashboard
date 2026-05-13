@@ -1,7 +1,7 @@
 # INVENTORY.md — Inventario maestro de infraestructura
 
-> Estado: **parcialmente verificado**. Solo VPS-MyRock fue discovery-eado a fondo. Los demás están con datos por confirmar.
-> Última actualización: 2026-05-12
+> Estado: **SSH verificado en los 4 servidores**. Specs reales obtenidos. Discovery completo pendiente para SUIG/OIC/Mail.
+> Última actualización: 2026-05-13
 
 ---
 
@@ -59,19 +59,23 @@
 
 ## VPS-2 · VPS-SUIG
 
-> ⏳ Discovery pendiente
+> ✅ SSH verificado 2026-05-13 — specs reales obtenidos
 
 | Campo | Valor |
 |---|---|
-| Hostname | `___` |
-| Proveedor | (por confirmar — probablemente Hetzner) |
+| Hostname real | `srv1482895` |
+| Proveedor | Hetzner |
 | Región | (por confirmar) |
-| OS | (por confirmar) |
-| Specs | ___ vCPU / ___ GB RAM / ___ GB disco |
-| Docker | Sí (confirmado por Jorge) |
-| IP pública | `___.___.___.___` |
-| IP Tailscale | (pendiente) |
-| Rol en NOC | Monitoreado por SSH |
+| OS | Ubuntu 22.04.5 LTS |
+| Specs reales | 4 vCPU / 15988 MB RAM (~16 GB) / 194 GB disco |
+| RAM en uso | 1748 / 15988 MB (11%) |
+| Disco en uso | 42 GB / 194 GB (22%) |
+| Load avg | 0.36 / 0.28 / 0.24 |
+| Docker | v29.3.0 |
+| IP pública | `187.124.152.86` |
+| IP Tailscale | (pendiente — no instalado aún) |
+| SSH user NOC | `root` |
+| Rol en NOC | Monitoreado por SSH desde VPS-MyRock |
 
 ### Servicios que corren aquí
 
@@ -84,28 +88,32 @@
 
 ### Bloqueadores antes de monitoreo
 
-- [ ] Confirmar hostname e IP pública
-- [ ] Confirmar dominio público de SUIG (probablemente `suig.cedhsinaloa.org.mx`)
+- [x] Confirmar hostname e IP pública → srv1482895 / 187.124.152.86
+- [x] Asegurar SSH desde VPS-MyRock funciona ✅
+- [ ] Confirmar dominio público de SUIG (`suig.cedhsinaloa.org.mx` probable)
 - [ ] Confirmar si cedhsinaloa.org.mx vive aquí o en otro lado
-- [ ] Asegurar SSH desde VPS-MyRock funciona
 
 ---
 
 ## VPS-3 · VPS-OIC
 
-> ⏳ Discovery pendiente
+> ✅ SSH verificado 2026-05-13 — specs reales obtenidos
 
 | Campo | Valor |
 |---|---|
-| Hostname | `___` |
-| Proveedor | (por confirmar) |
+| Hostname real | `srv1254764` |
+| Proveedor | Hostinger |
 | Región | (por confirmar) |
-| OS | (por confirmar) |
-| Specs | ___ vCPU / ___ GB RAM / ___ GB disco |
-| Docker | Sí (confirmado por Jorge) |
-| IP pública | `___.___.___.___` |
-| IP Tailscale | (pendiente) |
-| Rol en NOC | Monitoreado por SSH |
+| OS | Ubuntu 22.04.5 LTS |
+| Specs reales | 2 vCPU / 7937 MB RAM (~8 GB) / 97 GB disco |
+| RAM en uso | 3945 / 7937 MB (49%) |
+| Disco en uso | 53 GB / 97 GB (54%) |
+| Load avg | 0.14 / 0.10 / 0.09 |
+| Docker | v29.2.0 |
+| IP pública | `31.220.58.97` |
+| IP Tailscale | (pendiente — no instalado aún) |
+| SSH user NOC | `root` |
+| Rol en NOC | Monitoreado por SSH desde VPS-MyRock |
 
 ### Servicios que corren aquí
 
@@ -116,29 +124,33 @@
 
 ### Bloqueadores antes de monitoreo
 
-- [ ] Confirmar hostname, proveedor, IP
+- [x] Confirmar hostname, IP → srv1254764 / 31.220.58.97
+- [x] Asegurar SSH desde VPS-MyRock funciona ✅
 - [ ] Confirmar dominios públicos de los 3 sistemas
 - [ ] Confirmar motor DB
-- [ ] Asegurar SSH desde VPS-MyRock funciona
 
 ---
 
 ## VPS-4 · VPS-Mail (cedh-mail)
 
-> ⏳ Discovery pendiente
+> ✅ SSH verificado 2026-05-13 — Tailscale instalado
 
 | Campo | Valor |
 |---|---|
-| Hostname | `___` |
-| Proveedor | Contabo |
-| Región | EU |
-| OS | (por confirmar — Debian o Ubuntu) |
-| Specs | ___ vCPU / ___ GB RAM / ___ GB disco |
-| Docker | Sí (Mailcow ES Docker) |
+| Hostname real | `mail-server-cedh` |
+| Proveedor | Local (red CEDH Sinaloa) |
+| Región | Culiacán, Sinaloa |
+| OS | Ubuntu 24.04.4 LTS |
+| Specs reales | 12 vCPU / 31784 MB RAM (~32 GB) / 915 GB disco |
+| RAM en uso | 3498 / 31784 MB (11%) |
+| Disco en uso | 93 GB / 915 GB (11%) |
+| Load avg | 1.24 / 0.52 / 0.24 |
+| Docker | v29.4.3 |
 | Dominio principal | `mail.cedhsinaloa.org.mx` |
-| IP pública | `___.___.___.___` |
-| IP Tailscale | (pendiente) |
-| Rol en NOC | Monitoreado por SSH — **frágil, no tocar mucho** |
+| IP local | `192.168.128.215` |
+| IP Tailscale | `100.118.231.85` ✅ |
+| SSH user NOC | `jyanagui` |
+| Rol en NOC | Monitoreado vía Tailscale — **frágil, no tocar mucho** |
 
 ### Servicios que corren aquí
 
@@ -245,10 +257,12 @@ Stack Mailcow completo (todos containers Docker):
 - [ ] Discovery v2 corriendo en VPS-OIC
 - [ ] Discovery v2 corriendo en VPS-Mail
 - [ ] Confirmar dónde vive cedhsinaloa.org.mx
-- [ ] Confirmar dominios OIC
-- [ ] Crear cuenta Tailscale e instalar en VPS-MyRock + Tab A8
-- [ ] Crear llave SSH dedicada `noc_collector_ed25519` en VPS-MyRock
-- [ ] Instalar llave pública en los otros 3 VPS
-- [ ] Probar SSH desde VPS-MyRock con la llave dedicada
+- [ ] Confirmar dominios OIC (declaraciones, denuncias, ser-cedh)
+- [x] Crear cuenta Tailscale e instalar en VPS-MyRock + Tab A8 ✅
+- [x] Tailscale instalado en VPS-Mail (`100.118.231.85`) ✅
+- [x] Crear llave SSH dedicada `noc_collector_ed25519` en VPS-MyRock ✅
+- [x] Instalar llave pública en los otros 3 VPS ✅
+- [x] Probar SSH desde VPS-MyRock con la llave dedicada ✅ (3/3 OK)
 - [ ] Limpiar/identificar los 5 procesos PM2 huérfanos en VPS-MyRock
 - [ ] Decidir si Evolution API v1 ya se puede apagar (queda v2)
+- [ ] Actualizar SERVERS_CONFIG en .env del VPS con IPs y users reales
