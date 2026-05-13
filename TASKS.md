@@ -57,12 +57,12 @@
 
 ### 0.5 Inicializar repositorio
 
-- [ ] `git init` en local
-- [ ] Crear `.gitignore` con: `.env`, `*.key`, `*.pem`, `noc.db`, `__pycache__/`, `node_modules/`, `.venv/`
-- [ ] Primer commit con docs completas
-- [ ] Crear repo remoto (GitHub privado de Jorge)
-- [ ] Push inicial
-- [ ] Configurar branch protection en `main` (require PR review)
+- [x] `git init` en local
+- [x] Crear `.gitignore` con: `.env`, `*.key`, `*.pem`, `noc.db`, `__pycache__/`, `node_modules/`, `.venv/`
+- [x] Primer commit con docs completas
+- [x] Crear repo remoto → https://github.com/eljefe06/cedh-noc-dashboard (privado)
+- [x] Push inicial
+- [x] Configurar branch protection en `main` (require PR review)
 
 ---
 
