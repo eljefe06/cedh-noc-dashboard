@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     cors_allowed_origins: str = "http://localhost"
 
     # SSH
-    ssh_key_path: str = "/root/.ssh/noc_collector_ed25519"
+    ssh_key_path: str = "/home/nocapi/.ssh/noc_collector_ed25519"
     ssh_control_path: str = "~/.ssh/cm-%r@%h:%p"
     ssh_control_persist: str = "10m"
 

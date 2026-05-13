@@ -34,8 +34,10 @@ services:
     env_file: .env
     volumes:
       - noc-data:/data
-      # Comparte el mock-data para que el API pueda sembrarlo en startup
+      # Mock data — seeded into SQLite cache on startup (overwritten by real collectors)
       - ./frontend/mock-data:/app/frontend/mock-data:ro
+      # SSH key for connecting to the 4 VPS — must exist on VPS-MyRock before deploy
+      - /root/.ssh/noc_collector_ed25519:/home/nocapi/.ssh/noc_collector_ed25519:ro
     networks:
       - noc-net
     logging:

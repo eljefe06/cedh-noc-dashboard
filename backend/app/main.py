@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import time
@@ -13,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.routers.status import router as status_router
+from app.scheduler import run_scheduler
 from app.storage import cache_set, init_db
 
 # ── Logging ────────────────────────────────────────────────────────────────────
@@ -47,9 +49,21 @@ async def lifespan(app: FastAPI):
     else:
         log.warning("Mock file not found at %s — /api/v1/status will return 503 until collectors run", _MOCK_FILE)
 
+    # Start the collector scheduler as a background task
+    scheduler_task = asyncio.create_task(
+        run_scheduler(app.state, db, settings),
+        name="noc-scheduler",
+    )
+    log.info("Scheduler started")
+
     yield
 
     log.info("Shutting down NOC API")
+    scheduler_task.cancel()
+    try:
+        await scheduler_task
+    except asyncio.CancelledError:
+        pass
     db.close()
 
 

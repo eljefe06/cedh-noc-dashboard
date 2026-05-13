@@ -19,8 +19,11 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONPATH=/app
 
-# Non-root user
-RUN useradd -r -u 1001 -s /sbin/nologin nocapi
+# Non-root user with home directory (needed for SSH key access)
+RUN useradd -r -u 1001 -m -d /home/nocapi -s /sbin/nologin nocapi && \
+    mkdir -p /home/nocapi/.ssh && \
+    chmod 700 /home/nocapi/.ssh && \
+    chown -R nocapi:nocapi /home/nocapi
 
 WORKDIR /app
 

@@ -311,86 +311,72 @@
 
 ### 5.1 Collector base
 
-- [ ] Crear `app/collectors/base.py` con interface `Collector`
-- [ ] Worker async que ejecuta collectors según `poll_interval`
-- [ ] Cache en memoria con TTL
-- [ ] Persistencia de transiciones de estado en SQLite
+- [x] Crear `app/collectors/base.py` — CheckResult, MetricsResult, DockerResult dataclasses
+- [x] Worker async (scheduler.py) con poll intervals por tipo de check
+- [x] Cache en SQLite via cache_set — escrita al final de cada ciclo
+- [x] Persistencia de transiciones en SQLite (incident_open/resolve)
 
 ### 5.2 HTTP Collector
 
-- [ ] Crear `app/collectors/http.py`
-- [ ] Función `check_http(url, timeout) → CheckResult`
-- [ ] Mide latency, parsea status code
-- [ ] Si `/health` devuelve JSON, parsearlo
-- [ ] Tests con servidor mock local
-- [ ] Conectar al servicio MyRock (vive en mismo VPS, prueba interna)
-- [ ] Expandir a todos los servicios HTTP de `INVENTORY.md`
+- [x] Crear `app/collectors/http.py`
+- [x] `check_http(url, ...) → CheckResult` — latency + status code combinados
+- [x] `check_smtp_starttls`, `check_imap_tls` — protocolos de correo
+- [x] Conectado a todos los servicios HTTP de INVENTORY.md vía service_config.py
 
 ### 5.3 SSL Collector
 
-- [ ] Crear `app/collectors/ssl.py`
-- [ ] Función `check_ssl(domain) → SslCert`
-- [ ] Usa Python `ssl` module o `cryptography`
-- [ ] Calcula días restantes
-- [ ] Tests con dominio conocido
-- [ ] Iterar sobre lista de dominios de `INVENTORY.md`
+- [x] Crear `app/collectors/ssl.py`
+- [x] `check_ssl(domain) → SslCert dict` — usa cryptography para parsear DER cert
+- [x] Calcula días restantes, status ok/warning/critical/down según umbrales
+- [x] Iterar sobre lista de dominios de INVENTORY.md (en service_config.py)
 
 ### 5.4 DNS Collector
 
-- [ ] Crear `app/collectors/dns.py`
-- [ ] Usar `dnspython`
-- [ ] Funciones: `check_mx`, `check_spf`, `check_dmarc`, `check_a`, `check_ptr`
-- [ ] Función `check_smtp_starttls`, `check_imap_tls`
-- [ ] Tests
-- [ ] Iterar sobre lista de checks DNS de `INVENTORY.md`
+- [x] Crear `app/collectors/dns.py`
+- [x] `check_dns(type, domain, expected)` — usando dnspython
+- [x] Checks: mx, spf, dmarc, a, ptr
+- [x] Checks SMTP/IMAP en http.py
+- [x] DNS checks de INVENTORY.md en service_config.py
 
 ### 5.5 SSH Collector
 
-- [ ] Crear `app/collectors/ssh.py`
-- [ ] Usa `asyncssh` con ControlMaster path
-- [ ] Función `get_metrics(server) → MetricsDict` ejecutando `cat /proc/loadavg; free -m; df -h /`
-- [ ] Parser robusto de outputs
-- [ ] Tests con mock SSH
-- [ ] Conectar a VPS-SUIG y verificar
-- [ ] Conectar a VPS-OIC
-- [ ] Conectar a VPS-Mail
+- [x] Crear `app/collectors/ssh_metrics.py`
+- [x] `collect_metrics(host, user, key_path)` — asyncssh + python3 one-liner en el servidor
+- [x] Mide: cpu_percent, ram_percent, disk_percent, load, uptime, net_rx/tx (1s sample)
+- [~] Probar en VPS-SUIG, VPS-OIC, VPS-Mail — pendiente deploy
 
 ### 5.6 Docker Collector (V1)
 
-- [ ] Crear `app/collectors/docker_ssh.py`
-- [ ] Ejecuta `docker ps -a --format json` por SSH
-- [ ] Parser que devuelve lista de containers
-- [ ] Tests
-- [ ] Conectar a los servidores con Docker
+- [x] Crear `app/collectors/docker_ssh.py`
+- [x] `collect_docker(host, user, key_path)` — tab-delimited docker ps via SSH
+- [x] Parser: state, health (de status string), uptime, compose project
+- [~] Probar en servidores reales — pendiente deploy
 
-### 5.7 Backups Collector
+### 5.7 Backups Collector — diferido a V1.5
 
-- [ ] Crear `app/collectors/backups.py`
-- [ ] Configurar rutas de backups por servidor (en `INVENTORY.md`)
-- [ ] Ejecuta `ls -la <ruta>` por SSH y parsea fecha del último archivo
-- [ ] Tests
-
-### 5.8 Deploys Collector
-
-- [ ] Crear `app/collectors/deploys.py`
-- [ ] Configurar rutas de repos git
-- [ ] Ejecuta `git -C <path> log -1 --format='%h %ai %an %s'` por SSH
-- [ ] Parser
-- [ ] Tests
+### 5.8 Deploys Collector — diferido a V1.5
 
 ### 5.9 Status aggregator
 
-- [ ] Crear `app/aggregator.py` que junta todos los collectors
-- [ ] Aplica reglas de `overall_status` del contrato
-- [ ] Aplica reglas de `server.status`
-- [ ] Genera/cierra incidentes según transiciones de estado
-- [ ] Tests de las reglas con casos del contrato
+- [x] Crear `app/aggregator.py`
+- [x] `overall_status()` — aplica las 7 reglas del contrato
+- [x] `server_status()` — aplica las 5 reglas del contrato
+- [x] `build_status_response()` — genera el StatusResponse completo
+- [x] Tests de las reglas con casos del contrato ✅
 
 ### 5.10 End-to-end con datos reales
 
-- [ ] Endpoint `/api/v1/status` ya devuelve datos reales
+- [~] Deploy en VPS-MyRock — pendiente: git pull + docker compose up --build
 - [ ] Frontend muestra estado real
 - [ ] Validar en Tab A8
+
+### 5.11 Cambios de deploy requeridos
+
+- [ ] `git pull` en VPS-MyRock en `/opt/noc`
+- [ ] Actualizar `.env`: cambiar `SSH_KEY_PATH=/home/nocapi/.ssh/noc_collector_ed25519`
+- [ ] `docker compose up -d --build noc-api` (rebuild por nuevo Dockerfile)
+- [ ] Verificar logs: `docker compose logs -f noc-api`
+- [ ] Verificar que el scheduler arranca y los collectors corren
 
 ---
 

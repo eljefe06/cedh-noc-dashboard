@@ -140,3 +140,14 @@ def incidents_open_list(conn: sqlite3.Connection) -> list[dict]:
         "SELECT * FROM incidents WHERE status='open' ORDER BY started_at DESC"
     ).fetchall()
     return [dict(r) for r in rows]
+
+
+def incident_resolve_by_target(conn: sqlite3.Connection, target_type: str, target_name: str) -> None:
+    """Resolve all open incidents matching target_type + target_name."""
+    now = datetime.now(timezone.utc).isoformat()
+    conn.execute(
+        "UPDATE incidents SET status='resolved', resolved_at=? "
+        "WHERE status='open' AND target_type=? AND target_name=?",
+        (now, target_type, target_name),
+    )
+    conn.commit()
