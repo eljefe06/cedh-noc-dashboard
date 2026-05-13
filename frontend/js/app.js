@@ -59,7 +59,15 @@ var MOCK_DATA = {"generated_at":"2026-05-13T10:00:00-07:00","schema_version":"1.
 // ── API ───────────────────────────────────────────────────────────────────────
 
 function fetchStatus() {
-  return Promise.resolve(MOCKS[activeMock]);
+  // file:// → mock inline (dev local sin servidor)
+  if (window.location.protocol === 'file:') {
+    return Promise.resolve(MOCKS[activeMock]);
+  }
+  return fetch('/api/v1/status', { headers: { Accept: 'application/json' } })
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────

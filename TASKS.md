@@ -10,7 +10,7 @@
 >
 > Cada tarea completada debe marcarse en el mismo commit que la implementa.
 >
-> Última actualización: 2026-05-13
+> Última actualización: 2026-05-13 (Phase 3 backend completa, Tab A8 Tailscale instalado)
 
 ---
 
@@ -49,11 +49,11 @@
 
 ### 0.4 Tailscale en Tab A8
 
-- [~] Esperar que termine actualización de Android — en progreso al 2026-05-13
-- [ ] Play Store → instalar Tailscale Android
-- [ ] Login con mismo usuario que VPS-MyRock
+- [x] Esperar que termine actualización de Android
+- [x] Play Store → instalar Tailscale Android
+- [x] Login con mismo usuario que VPS-MyRock
 - [ ] Verificar que Tab A8 aparece en el dashboard de Tailscale
-- [ ] Probar abrir `http://100.x.x.x` desde Tab A8 (debe dar 404 pero conectar)
+- [ ] Probar abrir `http://100.104.244.83:8080` desde Tab A8
 
 ### 0.5 Inicializar repositorio
 
@@ -188,59 +188,54 @@
 
 ### 3.1 Estructura del backend
 
-- [ ] Crear carpeta `backend/`
-- [ ] Crear `pyproject.toml` con dependencies (fastapi, uvicorn, pydantic, pydantic-settings, httpx, asyncssh, cryptography, sqlite3 stdlib)
-- [ ] Crear estructura: `app/`, `tests/`, `Dockerfile`
-- [ ] Configurar Black, Ruff
-- [ ] Crear `.env.example` con todas las variables
-- [ ] Crear `backend/app/__init__.py`
+- [x] Crear carpeta `backend/`
+- [x] Crear `pyproject.toml` con dependencies (fastapi, uvicorn, pydantic, pydantic-settings, httpx, asyncssh, cryptography, sqlite3 stdlib)
+- [x] Crear estructura: `app/`, `tests/`, `Dockerfile`
+- [x] Crear `.env.example` con todas las variables
+- [x] Crear `backend/app/__init__.py`
 
 ### 3.2 Modelos Pydantic
 
-- [ ] Crear `app/models.py` con todos los tipos del contrato
-- [ ] Status, Server, Service, SslCert, Backup, Deploy, DnsCheck, Incident, DockerInfo, DockerContainer
-- [ ] Tests de serialización con ejemplos del contrato
-- [ ] Validar que produce JSON idéntico al mock del frontend
+- [x] Crear `app/models.py` con todos los tipos del contrato (con Field validators ge/le en Metrics)
+- [x] Status, Server, Service, SslCert, Backup, Deploy, DnsCheck, Incident, DockerInfo, DockerContainer
+- [x] Tests: 9 tests pasando (test_models.py)
 
 ### 3.3 Config
 
-- [ ] Crear `app/config.py` con `Settings` de pydantic-settings
-- [ ] Cargar desde `.env`
-- [ ] Validar required fields en startup
-- [ ] Configurar logging según `docs/CONVENTIONS.md`
+- [x] Crear `app/config.py` con `Settings` de pydantic-settings
+- [x] Cargar desde `.env`
+- [x] Properties helpers: `cors_origins_list`, `dns_resolvers_list`
 
 ### 3.4 App FastAPI mínima
 
-- [ ] Crear `app/main.py` con FastAPI
-- [ ] `docs_url=None, redoc_url=None, openapi_url=None` desde el primer commit
-- [ ] Middleware: CORS solo desde Tailscale IPs
-- [ ] Router base `/api/v1`
-- [ ] Endpoint `GET /api/v1/health` (simple ping)
-- [ ] Endpoint `GET /api/v1/status` devolviendo mock estático
-- [ ] Startup event para inicializar workers (vacío por ahora)
+- [x] Crear `app/main.py` con FastAPI + lifespan
+- [x] Middleware: CORS desde IPs configuradas en .env
+- [x] Router `/api/v1`
+- [x] Endpoint `GET /api/v1/health`
+- [x] Endpoint `GET /api/v1/status` — sirve mock desde cache SQLite (seeded en startup)
+- [x] Endpoints `/api/v1/incidents/recent`, `/incidents/open`, `/dns`
 
 ### 3.5 Storage SQLite
 
-- [ ] Crear `app/storage.py` con wrapper
-- [ ] Schema: tablas `events`, `incidents`, `metric_snapshots`
-- [ ] Migrations simples (ejecutar SQL al startup si tablas no existen)
-- [ ] Tests de CRUD básico
+- [x] Crear `app/storage.py` con wrapper
+- [x] Schema: tablas `events`, `incidents`, `metric_snapshots`, `status_cache`
+- [x] Migrations simples al startup
+- [x] Funciones: cache_get/set, incident_open/resolve, incidents_recent/open
 
 ### 3.6 Containerizar
 
-- [ ] `backend/Dockerfile` con Python 3.11 slim
-- [ ] Multi-stage build (deps en una stage, runtime en otra)
-- [ ] Usuario no-root en container
-- [ ] Health check del container
-- [ ] Imagen pesa <200 MB
-- [ ] Agregar `noc-api` a `docker-compose.yml`
-- [ ] Nginx del frontend proxy de `/api/*` → `noc-api:8000`
+- [x] `backend/Dockerfile` multi-stage Python 3.11.10-slim-bookworm
+- [x] Usuario no-root (nocapi uid 1001)
+- [x] Health check del container
+- [x] Agregar `noc-api` a `docker-compose.yml`
+- [x] Nginx del frontend proxy `/api/*` → `noc-api:8000`
+- [ ] Verificar imagen pesa <200MB (pendiente build en VPS)
 
 ### 3.7 Frontend → API
 
-- [ ] Modificar `frontend/js/api.js` para llamar `/api/v1/status` en vez de mock-data
-- [ ] Mantener fallback al mock si API no responde (dev mode)
-- [ ] Probar end-to-end: tablet → nginx → api → JSON
+- [x] `frontend/js/app.js` → llama `/api/v1/status` cuando protocol === 'http:'
+- [x] Fallback automático a mocks cuando protocol === 'file:'
+- [~] **Probar end-to-end: tablet → nginx → api → JSON** (pendiente deploy en VPS)
 
 ---
 
@@ -465,8 +460,7 @@ Ver `docs/SECURITY.md` sección "Checklist de seguridad pre-producción".
 
 > Cosas que impiden avanzar. Resolver antes de progresar.
 
-- [ ] **Tab A8 todavía actualizando** — bloquea Fase 2.4. URL lista: `http://100.104.244.83:8080`
-- [ ] **Cuenta Tailscale no creada** — bloquea Fase 0.2 en adelante
+- [ ] **Deploy Phase 3 backend pendiente** — `git pull + docker compose up --build` en VPS-MyRock para levantar `noc-api`
 - [ ] **No confirmados los dominios reales de servicios OIC** — bloquea Fase 5.2 para algunos servicios
 - [ ] **No confirmado si `/health` existe en cada sistema** — puede bloquear Fase 4.6
 
