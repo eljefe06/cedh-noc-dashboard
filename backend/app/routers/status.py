@@ -20,10 +20,12 @@ _start_time = time.time()
 def _verify_token(
     creds: HTTPAuthorizationCredentials | None = Depends(_bearer),
 ) -> None:
-    """Require Bearer token only if one is configured (not the default 'changeme')."""
-    if settings.noc_api_bearer_token == "changeme":
-        return  # dev mode — no auth
-    if creds is None or creds.credentials != settings.noc_api_bearer_token:
+    """Require Bearer token only if NOC_API_BEARER_TOKEN is set to a real value.
+    Placeholder values starting with 'changeme' disable auth (V1 inside Tailscale)."""
+    token = settings.noc_api_bearer_token
+    if not token or token.startswith("changeme"):
+        return  # inside Tailscale — auth optional per API_CONTRACT V1
+    if creds is None or creds.credentials != token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or missing Bearer token",
