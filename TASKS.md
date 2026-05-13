@@ -270,10 +270,12 @@
 
 ### 4.4 Discovery en VPS-OIC
 
-- [ ] Correr `scripts/discovery-v2.sh`
-- [ ] Guardar JSON
-- [ ] Pegar a Jorge para review
-- [ ] Actualizar `docs/INVENTORY.md`
+- [x] Discovery vía SSH completado 2026-05-13
+- [x] Actualizar `INVENTORY.md` con datos reales ✅
+- Proyectos: sistema-declaraciones, sier, denuncia-oic, oic
+- Dominios: declaraciones., oic., sier.cedhsinaloa.org.mx
+- PM2: oic-portal, oic-api, oic-panel (15d uptime)
+- ⚠️ declaraciones.cedhsinaloa.org.mx sin SSL — pendiente informar a Jorge
 
 ### 4.5 Discovery en VPS-Mail
 

@@ -133,19 +133,46 @@
 | SSH user NOC | `root` |
 | Rol en NOC | Monitoreado por SSH desde VPS-MyRock |
 
-### Servicios que corren aquí
+### Docker Compose projects
 
-- [ ] **Declaraciones** patrimoniales (integrado con PDN) — dominio: ?
-- [ ] **Denuncias** — dominio: ?
-- [ ] **CEDH-SIER** (Sistema de Entrega-Recepción) / SER-CEDH — dominio: ?
-- [ ] Base de datos (¿Postgres? ¿MySQL? — por confirmar)
+| Proyecto | Containers | Notas |
+|---|---|---|
+| `sistema-declaraciones` | frontend (8080), backend (3000), mongodb, reportes (3001), elasticsearch | SiDeclara — Declaraciones patrimoniales |
+| `sier` | sier_app (→8090), sier_db (MariaDB 11) | Sistema de Entrega-Recepción |
+| `denuncia-oic` | postgres, redis, minio (9000-9001), oic_sync | Sistema de Denuncias OIC |
+| `oic` | oic_dashboard (Streamlit, 8501), oic_sqlserver (SQL Server 2022) | Dashboard analítico + BD legado |
+
+### PM2 processes
+
+| Nombre | Puerto | Uptime | Reintentos |
+|---|---|---|---|
+| oic-portal | 3005 | 15 días | 2 |
+| oic-api | 3001 | 15 días | 3 |
+| oic-panel | 3004 | 15 días | 2 |
+
+### Dominios verificados (nginx)
+
+| Dominio | Sistema | URL check | SSL | Criticidad |
+|---|---|---|---|---|
+| `declaraciones.cedhsinaloa.org.mx` | SiDeclara (frontend:8080 + backend:3000) | `https://declaraciones.cedhsinaloa.org.mx/` | ⚠️ solo HTTP — sin cert | high |
+| `oic.cedhsinaloa.org.mx` | Portal OIC (PM2 oic-portal:3005) | `https://oic.cedhsinaloa.org.mx/` | ✅ Let's Encrypt | high |
+| `sier.cedhsinaloa.org.mx` | SIER (sier_app:8090) | `https://sier.cedhsinaloa.org.mx/` | ✅ Let's Encrypt | high |
+
+### Certificados SSL
+
+| Cert | Dominios | Estado |
+|---|---|---|
+| oic.cedhsinaloa.org.mx | oic.cedhsinaloa.org.mx | verificar días |
+| sier.cedhsinaloa.org.mx | sier.cedhsinaloa.org.mx | verificar días |
+| declaraciones.cedhsinaloa.org.mx | **sin SSL** ⚠️ — corre HTTP | pendiente |
 
 ### Bloqueadores antes de monitoreo
 
 - [x] Confirmar hostname, IP → srv1254764 / 31.220.58.97
 - [x] Asegurar SSH desde VPS-MyRock funciona ✅
-- [ ] Confirmar dominios públicos de los 3 sistemas
-- [ ] Confirmar motor DB
+- [x] Confirmar dominios → declaraciones., oic., sier.cedhsinaloa.org.mx ✅
+- [x] Confirmar motores DB → MariaDB 11, MongoDB, PostgreSQL, SQL Server 2022
+- [ ] ⚠️ declaraciones.cedhsinaloa.org.mx corre sin SSL — reportar a Jorge
 
 ---
 
@@ -204,9 +231,9 @@ Stack Mailcow completo (todos containers Docker):
 | cedhsinaloa.org.mx | `https://cedhsinaloa.org.mx/` | vps-suig ✅ | high | verificado |
 | SUIG | `https://suig.cedhsinaloa.org.mx/` | vps-suig ✅ | high | verificado |
 | Buzón Electrónico | `https://buzon.cedhsinaloa.org.mx/` | vps-suig ✅ | high | verificado |
-| SER-CEDH | `https://___/` | vps-oic | high | pendiente |
-| Declaraciones | `https://___/` | vps-oic | high | pendiente |
-| Denuncias | `https://___/` | vps-oic | high | pendiente |
+| SIER | `https://sier.cedhsinaloa.org.mx/` | vps-oic ✅ | high | verificado |
+| Declaraciones | `http://declaraciones.cedhsinaloa.org.mx/` | vps-oic ✅ | high | ⚠️ HTTP only |
+| Portal OIC | `https://oic.cedhsinaloa.org.mx/` | vps-oic ✅ | high | verificado |
 | Mailcow SOGo | `https://mail.cedhsinaloa.org.mx/SOGo/` | cedh-mail | high | pendiente |
 | Mailcow admin | `https://mail.cedhsinaloa.org.mx/` | cedh-mail | medium | pendiente |
 | cedhs.xyz | `https://cedhs.xyz/` | suig-vps | medium | pendiente |
