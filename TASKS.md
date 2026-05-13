@@ -137,26 +137,26 @@
 
 ### 2.1 Preparar nginx en VPS-MyRock
 
-- [ ] Identificar si nginx existente (proyecto `infra`) puede agregar un nuevo virtual host
-- [ ] Si no: crear nginx específico en `noc-stack`
-- [ ] Configurar bind explícito a IP Tailscale (`100.x.x.x:80`), no `0.0.0.0`
-- [ ] Verificar UFW: NOC no expuesto en IP pública
+- [x] Identificar si nginx existente puede agregar virtual host → no conveniente (nginx nativo en 0.0.0.0:80)
+- [x] Crear nginx específico en `noc-stack` (contenedor Docker)
+- [x] Configurar bind explícito a IP Tailscale → `100.104.244.83:8080` (8080 porque 80 ya ocupado)
+- [x] Verificar UFW: NOC no expuesto en IP pública ✓
 
 ### 2.2 Docker Compose para noc-stack (mock-only)
 
-- [ ] Crear `docker-compose.yml` en raíz del repo
-- [ ] Service `noc-frontend`: nginx alpine sirviendo `frontend/`
-- [ ] Volúmenes: montar `frontend/` read-only
-- [ ] Red: docker network propia `noc-net`
-- [ ] Restart policy: `unless-stopped`
-- [ ] Logging driver: json-file con rotación
+- [x] Crear `docker-compose.yml` en raíz del repo
+- [x] Service `noc-frontend`: nginx alpine sirviendo `frontend/`
+- [x] Volúmenes: montar `frontend/` read-only
+- [x] Red: docker network propia `noc-net`
+- [x] Restart policy: `unless-stopped`
+- [x] Logging driver: json-file con rotación
 
 ### 2.3 Deploy del mock
 
-- [ ] Clonar repo en VPS-MyRock vía SSH
-- [ ] `docker compose up -d noc-frontend`
-- [ ] Verificar que escucha en IP Tailscale
-- [ ] Probar `curl http://100.x.x.x` desde laptop (debe responder)
+- [x] Clonar repo en VPS-MyRock → `/opt/noc`
+- [x] `docker compose up -d noc-frontend` → HTTP 200 OK
+- [x] Verificar que escucha en IP Tailscale → `100.104.244.83:8080`
+- [x] Probar desde Mac con Tailscale → dashboard visible ✓
 
 ### 2.4 Configurar Tab A8
 
@@ -465,7 +465,7 @@ Ver `docs/SECURITY.md` sección "Checklist de seguridad pre-producción".
 
 > Cosas que impiden avanzar. Resolver antes de progresar.
 
-- [ ] **Tab A8 todavía actualizando** — bloquea pruebas en hardware real (Fase 2.4 en adelante)
+- [ ] **Tab A8 todavía actualizando** — bloquea Fase 2.4. URL lista: `http://100.104.244.83:8080`
 - [ ] **Cuenta Tailscale no creada** — bloquea Fase 0.2 en adelante
 - [ ] **No confirmados los dominios reales de servicios OIC** — bloquea Fase 5.2 para algunos servicios
 - [ ] **No confirmado si `/health` existe en cada sistema** — puede bloquear Fase 4.6
