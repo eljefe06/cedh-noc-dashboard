@@ -261,10 +261,12 @@
 
 ### 4.3 Discovery en VPS-SUIG
 
-- [ ] Correr `scripts/discovery-v2.sh` por SSH desde VPS-MyRock
-- [ ] Guardar JSON resultado
-- [ ] Pegar a Jorge para review
-- [ ] Actualizar `docs/INVENTORY.md` con datos reales
+- [x] Discovery vía SSH completado 2026-05-13
+- [x] Actualizar `INVENTORY.md` con datos reales ✅
+- Proyectos: suig-cedh, cedh-sinaloa, evolution-api (v1 interno)
+- Dominios: cedhsinaloa.org.mx, suig., buzon. (todos en vps-suig)
+- [ ] Verificar SSL de suig. y buzon. subdomains
+- [ ] Confirmar cedhs.xyz
 
 ### 4.4 Discovery en VPS-OIC
 

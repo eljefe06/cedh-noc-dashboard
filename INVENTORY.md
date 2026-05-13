@@ -77,21 +77,39 @@
 | SSH user NOC | `root` |
 | Rol en NOC | Monitoreado por SSH desde VPS-MyRock |
 
-### Servicios que corren aquí
+### Docker Compose projects
 
-- [ ] **SUIG** (Sistema Único de Información para la Gestión de Quejas) — Docker
-- [ ] **cedhsinaloa.org.mx** — WordPress (¿confirmar si vive aquí?)
-- [ ] **Mesa de Control** (módulo SUIG)
-- [ ] **Buzón Electrónico** — `buzon.cedhsinaloa.org.mx`
-- [ ] **cedhs.xyz** — acortador URL
-- [ ] MariaDB / MySQL (motor DB de SUIG)
+| Proyecto | Containers | Notas |
+|---|---|---|
+| `suig-cedh` | suig-local-web (Apache), suig-local-db (MariaDB 11.5) | App principal + proxy inverso para todo |
+| `cedh-sinaloa` | cedh-sinaloa-web (WordPress php8.1), cedh-sinaloa-db (MariaDB 10.11) | Sitio institucional |
+| `evolution-api` | evolution-api (v1.8.2), redis, mongo, postgres | Solo en 127.0.0.1:8080 — interno |
+
+### Dominios verificados (Apache vhosts)
+
+| Dominio | Tipo | URL check | Criticidad |
+|---|---|---|---|
+| `cedhsinaloa.org.mx` | WordPress (proxy → cedh-sinaloa-web) | `https://cedhsinaloa.org.mx/` | high |
+| `www.cedhsinaloa.org.mx` | alias de lo anterior | — | — |
+| `suig.cedhsinaloa.org.mx` | SUIG app PHP/Apache | `https://suig.cedhsinaloa.org.mx/` | high |
+| `buzon.cedhsinaloa.org.mx` | Buzón Electrónico (mismo código SUIG, distinto vhost) | `https://buzon.cedhsinaloa.org.mx/` | high |
+| `suigcedhsinaloa.org.mx` | Dominio legacy (vhost suig-ssl.conf) | `https://suigcedhsinaloa.org.mx/` | low |
+
+### Certificados SSL
+
+| Cert | Dominios cubiertos | Expira | Días restantes |
+|---|---|---|---|
+| cedhsinaloa.org.mx-0001 | cedhsinaloa.org.mx, www. | 2026-08-08 | ~87d ✅ |
+| Pendiente verificar | suig., buzon. subdomains | — | — |
 
 ### Bloqueadores antes de monitoreo
 
 - [x] Confirmar hostname e IP pública → srv1482895 / 187.124.152.86
 - [x] Asegurar SSH desde VPS-MyRock funciona ✅
-- [ ] Confirmar dominio público de SUIG (`suig.cedhsinaloa.org.mx` probable)
-- [ ] Confirmar si cedhsinaloa.org.mx vive aquí o en otro lado
+- [x] Confirmar dominio SUIG → `suig.cedhsinaloa.org.mx` ✅
+- [x] Confirmar si cedhsinaloa.org.mx vive aquí → Sí, WordPress en proxy ✅
+- [ ] Verificar SSL de suig. y buzon. subdomains
+- [ ] Confirmar si cedhs.xyz también corre en este VPS
 
 ---
 
@@ -183,9 +201,9 @@ Stack Mailcow completo (todos containers Docker):
 
 | Servicio | URL para check | Servidor | Criticidad | Estado |
 |---|---|---|---|---|
-| cedhsinaloa.org.mx | `https://cedhsinaloa.org.mx/` | suig-vps (?) | high | pendiente |
-| SUIG | `https://suig.cedhsinaloa.org.mx/` | suig-vps | high | pendiente |
-| Buzón Electrónico | `https://buzon.cedhsinaloa.org.mx/` | suig-vps | high | pendiente |
+| cedhsinaloa.org.mx | `https://cedhsinaloa.org.mx/` | vps-suig ✅ | high | verificado |
+| SUIG | `https://suig.cedhsinaloa.org.mx/` | vps-suig ✅ | high | verificado |
+| Buzón Electrónico | `https://buzon.cedhsinaloa.org.mx/` | vps-suig ✅ | high | verificado |
 | SER-CEDH | `https://___/` | vps-oic | high | pendiente |
 | Declaraciones | `https://___/` | vps-oic | high | pendiente |
 | Denuncias | `https://___/` | vps-oic | high | pendiente |
