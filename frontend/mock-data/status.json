@@ -1,0 +1,443 @@
+{
+  "generated_at": "2026-05-13T10:00:00-07:00",
+  "schema_version": "1.0",
+  "overall_status": "ok",
+  "incidents_open": 0,
+  "uptime": {
+    "since": "2026-04-29T03:18:00-07:00",
+    "seconds": 1209682,
+    "human": "14d 06:42"
+  },
+  "servers": [
+    {
+      "name": "vps-myrock",
+      "display_name": "OpenClaw",
+      "status": "ok",
+      "provider": "Hetzner",
+      "region": "nbg1",
+      "specs": { "vcpu": 2, "ram_gb": 8, "disk_gb": 96 },
+      "tailscale_ip": "100.104.244.83",
+      "agent_reachable": true,
+      "agent_last_seen": "2026-05-13T10:00:00-07:00",
+      "stale": false,
+      "metrics": {
+        "cpu_percent": 12,
+        "ram_percent": 36,
+        "disk_percent": 56,
+        "load_1m": 1.07,
+        "load_5m": 1.20,
+        "load_15m": 1.20,
+        "uptime_seconds": 1209682,
+        "net_rx_mbps": 2.1,
+        "net_tx_mbps": 8.4
+      },
+      "services": [
+        {
+          "name": "pagokids.com.mx",
+          "type": "http",
+          "criticality": "high",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 112,
+          "p95_ms_24h": 189,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": "https://pagokids.com.mx/",
+          "extra": { "latency_history": [98,112,105,118,110,115,108,102,119,112,107,115,110,112,108,119,112,105,118,112] }
+        },
+        {
+          "name": "myrock.com.mx",
+          "type": "http",
+          "criticality": "medium",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 89,
+          "p95_ms_24h": 142,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": "https://myrock.com.mx/",
+          "extra": { "latency_history": [82,89,85,92,88,90,84,91,87,89,85,92,88,89,91,84,90,87,89,89] }
+        },
+        {
+          "name": "n8n",
+          "type": "http",
+          "criticality": "medium",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 204,
+          "p95_ms_24h": 312,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": null,
+          "extra": { "latency_history": [190,204,198,215,205,200,210,204,196,206,202,204,208,202,198,204,201,198,210,204] }
+        }
+      ],
+      "ssl": [
+        {
+          "domain": "myrock.com.mx",
+          "days_left": 62,
+          "expires_at": "2026-07-14T00:00:00-07:00",
+          "issuer": "Let's Encrypt",
+          "status": "ok",
+          "checked_externally": true,
+          "last_checked": "2026-05-13T10:00:00-07:00"
+        },
+        {
+          "domain": "pagokids.com.mx",
+          "days_left": 55,
+          "expires_at": "2026-07-07T00:00:00-07:00",
+          "issuer": "Let's Encrypt",
+          "status": "ok",
+          "checked_externally": true,
+          "last_checked": "2026-05-13T10:00:00-07:00"
+        }
+      ],
+      "backups": [],
+      "deploys": [
+        {
+          "repo": "myrock-stack",
+          "branch": "main",
+          "commit_sha": "a1b2c3d",
+          "commit_message": "fix: optimize payment webhook handler",
+          "author": "eljefe06",
+          "deployed_at": "2026-05-13T08:15:00-07:00",
+          "age_hours": 1.75,
+          "status": "ok"
+        }
+      ],
+      "docker": null
+    },
+    {
+      "name": "vps-suig",
+      "display_name": "VPS-SUIG",
+      "status": "ok",
+      "provider": "Hetzner",
+      "region": "fsn1",
+      "specs": { "vcpu": 2, "ram_gb": 4, "disk_gb": 80 },
+      "tailscale_ip": null,
+      "agent_reachable": true,
+      "agent_last_seen": "2026-05-13T10:00:00-07:00",
+      "stale": false,
+      "metrics": {
+        "cpu_percent": 8,
+        "ram_percent": 45,
+        "disk_percent": 38,
+        "load_1m": 0.42,
+        "load_5m": 0.38,
+        "load_15m": 0.35,
+        "uptime_seconds": 2592000,
+        "net_rx_mbps": 1.2,
+        "net_tx_mbps": 3.8
+      },
+      "services": [
+        {
+          "name": "cedhsinaloa.org.mx",
+          "type": "http",
+          "criticality": "high",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 198,
+          "p95_ms_24h": 342,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": "https://cedhsinaloa.org.mx/",
+          "extra": { "latency_history": [180,198,210,195,188,202,198,205,192,198,185,201,198,195,200,198,210,195,188,198] }
+        },
+        {
+          "name": "suig.cedhsinaloa",
+          "type": "http",
+          "criticality": "high",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 182,
+          "p95_ms_24h": 298,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": "https://suig.cedhsinaloa.org.mx/",
+          "extra": { "latency_history": [170,182,175,188,180,178,185,182,176,183,179,182,185,180,175,182,178,183,180,182] }
+        },
+        {
+          "name": "buzon.cedhsinaloa",
+          "type": "http",
+          "criticality": "high",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 92,
+          "p95_ms_24h": 145,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": "https://buzon.cedhsinaloa.org.mx/",
+          "extra": { "latency_history": [85,92,88,95,90,88,94,91,87,92,89,92,95,90,88,92,91,87,93,92] }
+        },
+        {
+          "name": "cedhs.xyz",
+          "type": "http",
+          "criticality": "medium",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 78,
+          "p95_ms_24h": 112,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": "https://cedhs.xyz/",
+          "extra": {}
+        }
+      ],
+      "ssl": [
+        {
+          "domain": "cedhsinaloa.org.mx",
+          "days_left": 45,
+          "expires_at": "2026-06-27T00:00:00-07:00",
+          "issuer": "Let's Encrypt",
+          "status": "ok",
+          "checked_externally": true,
+          "last_checked": "2026-05-13T10:00:00-07:00"
+        },
+        {
+          "domain": "suig.cedhsinaloa.org.mx",
+          "days_left": 45,
+          "expires_at": "2026-06-27T00:00:00-07:00",
+          "issuer": "Let's Encrypt",
+          "status": "ok",
+          "checked_externally": true,
+          "last_checked": "2026-05-13T10:00:00-07:00"
+        },
+        {
+          "domain": "buzon.cedhsinaloa.org.mx",
+          "days_left": 38,
+          "expires_at": "2026-06-20T00:00:00-07:00",
+          "issuer": "Let's Encrypt",
+          "status": "ok",
+          "checked_externally": true,
+          "last_checked": "2026-05-13T10:00:00-07:00"
+        }
+      ],
+      "backups": [],
+      "deploys": [
+        {
+          "repo": "suig",
+          "branch": "main",
+          "commit_sha": "e4f5g6h",
+          "commit_message": "chore: update Node dependencies",
+          "author": "eljefe06",
+          "deployed_at": "2026-05-12T14:30:00-07:00",
+          "age_hours": 19.5,
+          "status": "ok"
+        }
+      ],
+      "docker": null
+    },
+    {
+      "name": "vps-oic",
+      "display_name": "VPS-OIC",
+      "status": "ok",
+      "provider": "Hetzner",
+      "region": "nbg1",
+      "specs": { "vcpu": 2, "ram_gb": 4, "disk_gb": 80 },
+      "tailscale_ip": null,
+      "agent_reachable": true,
+      "agent_last_seen": "2026-05-13T10:00:00-07:00",
+      "stale": false,
+      "metrics": {
+        "cpu_percent": 5,
+        "ram_percent": 32,
+        "disk_percent": 28,
+        "load_1m": 0.18,
+        "load_5m": 0.22,
+        "load_15m": 0.20,
+        "uptime_seconds": 3888000,
+        "net_rx_mbps": 0.5,
+        "net_tx_mbps": 1.2
+      },
+      "services": [
+        {
+          "name": "ser-cedh",
+          "type": "http",
+          "criticality": "high",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 152,
+          "p95_ms_24h": 245,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": null,
+          "extra": { "latency_history": [140,152,148,158,150,145,155,152,148,153,150,152,156,150,148,152,151,148,155,152] }
+        },
+        {
+          "name": "declaraciones",
+          "type": "http",
+          "criticality": "high",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 164,
+          "p95_ms_24h": 268,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": null,
+          "extra": { "latency_history": [155,164,160,170,162,158,168,164,159,165,162,164,168,162,160,164,163,160,167,164] }
+        },
+        {
+          "name": "denuncias",
+          "type": "http",
+          "criticality": "high",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 138,
+          "p95_ms_24h": 225,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": null,
+          "extra": { "latency_history": [128,138,133,142,136,132,140,138,133,139,136,138,141,136,133,138,137,134,141,138] }
+        }
+      ],
+      "ssl": [],
+      "backups": [],
+      "deploys": [],
+      "docker": null
+    },
+    {
+      "name": "vps-mail",
+      "display_name": "VPS-Mail",
+      "status": "ok",
+      "provider": "Contabo",
+      "region": "eu",
+      "specs": { "vcpu": 4, "ram_gb": 8, "disk_gb": 200 },
+      "tailscale_ip": null,
+      "agent_reachable": true,
+      "agent_last_seen": "2026-05-13T10:00:00-07:00",
+      "stale": false,
+      "metrics": {
+        "cpu_percent": 15,
+        "ram_percent": 58,
+        "disk_percent": 42,
+        "load_1m": 0.85,
+        "load_5m": 0.78,
+        "load_15m": 0.72,
+        "uptime_seconds": 5184000,
+        "net_rx_mbps": 4.2,
+        "net_tx_mbps": 6.8
+      },
+      "services": [
+        {
+          "name": "mailcow.sogo",
+          "type": "http",
+          "criticality": "high",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 248,
+          "p95_ms_24h": 398,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": "https://mail.cedhsinaloa.org.mx/SOGo/",
+          "extra": { "latency_history": [230,248,242,258,244,240,252,248,242,250,246,248,255,246,242,248,245,242,252,248] }
+        },
+        {
+          "name": "smtp.587",
+          "type": "smtp",
+          "criticality": "high",
+          "status": "ok",
+          "http_status": null,
+          "latency_ms": 45,
+          "p95_ms_24h": 78,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": "mail.cedhsinaloa.org.mx:587",
+          "extra": { "starttls": true, "latency_history": [40,45,42,48,44,42,47,45,42,46,44,45,48,44,42,45,44,42,47,45] }
+        },
+        {
+          "name": "imap.993",
+          "type": "imap",
+          "criticality": "high",
+          "status": "ok",
+          "http_status": null,
+          "latency_ms": 38,
+          "p95_ms_24h": 62,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": "mail.cedhsinaloa.org.mx:993",
+          "extra": { "tls": true, "latency_history": [34,38,36,40,37,35,39,38,36,38,37,38,40,37,36,38,37,36,39,38] }
+        },
+        {
+          "name": "mailcow.admin",
+          "type": "http",
+          "criticality": "medium",
+          "status": "ok",
+          "http_status": 200,
+          "latency_ms": 312,
+          "p95_ms_24h": 480,
+          "last_checked": "2026-05-13T10:00:00-07:00",
+          "last_error": null,
+          "url_checked": "https://mail.cedhsinaloa.org.mx/",
+          "extra": {}
+        }
+      ],
+      "ssl": [
+        {
+          "domain": "mail.cedhsinaloa.org.mx",
+          "days_left": 18,
+          "expires_at": "2026-05-31T00:00:00-07:00",
+          "issuer": "Let's Encrypt",
+          "status": "warning",
+          "checked_externally": true,
+          "last_checked": "2026-05-13T10:00:00-07:00"
+        }
+      ],
+      "backups": [],
+      "deploys": [],
+      "docker": null
+    }
+  ],
+  "dns_checks": [
+    {
+      "domain": "cedhsinaloa.org.mx",
+      "check_type": "mx",
+      "expected": "mail.cedhsinaloa.org.mx",
+      "actual": "mail.cedhsinaloa.org.mx",
+      "status": "ok",
+      "resolver": "1.1.1.1",
+      "criticality": "high",
+      "last_checked": "2026-05-13T09:00:00-07:00"
+    },
+    {
+      "domain": "cedhsinaloa.org.mx",
+      "check_type": "spf",
+      "expected": "v=spf1",
+      "actual": "v=spf1 include:_spf.google.com ~all",
+      "status": "ok",
+      "resolver": "1.1.1.1",
+      "criticality": "high",
+      "last_checked": "2026-05-13T09:00:00-07:00"
+    },
+    {
+      "domain": "_dmarc.cedhsinaloa.org.mx",
+      "check_type": "dmarc",
+      "expected": "v=DMARC1",
+      "actual": "v=DMARC1; p=quarantine",
+      "status": "ok",
+      "resolver": "1.1.1.1",
+      "criticality": "high",
+      "last_checked": "2026-05-13T09:00:00-07:00"
+    },
+    {
+      "domain": "mail.cedhsinaloa.org.mx",
+      "check_type": "smtp_starttls",
+      "expected": "STARTTLS",
+      "actual": "STARTTLS",
+      "status": "ok",
+      "resolver": "1.1.1.1",
+      "criticality": "high",
+      "last_checked": "2026-05-13T10:00:00-07:00"
+    },
+    {
+      "domain": "mail.cedhsinaloa.org.mx",
+      "check_type": "imap_tls",
+      "expected": "TLS",
+      "actual": "TLS",
+      "status": "ok",
+      "resolver": "1.1.1.1",
+      "criticality": "high",
+      "last_checked": "2026-05-13T10:00:00-07:00"
+    }
+  ],
+  "recent_incidents": []
+}
