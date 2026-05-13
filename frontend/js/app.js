@@ -2,10 +2,18 @@
 
 const STATUS_COLOR = {
   ok:       'var(--neon-lime)',
-  warning:  'var(--neon-orange)',
+  warning:  'var(--neon-blue)',
   critical: 'var(--neon-magenta)',
   down:     'var(--neon-magenta)',
   unknown:  'var(--text-tertiary)',
+};
+
+const STATUS_SYMBOL = {
+  ok:       '',
+  warning:  '▲ ',
+  critical: '✕ ',
+  down:     '✕ ',
+  unknown:  '? ',
 };
 
 const STATUS_CLASS = {
@@ -51,7 +59,7 @@ var MOCK_DATA = {"generated_at":"2026-05-13T10:00:00-07:00","schema_version":"1.
 // ── API ───────────────────────────────────────────────────────────────────────
 
 function fetchStatus() {
-  return Promise.resolve(MOCK_DATA);
+  return Promise.resolve(MOCKS[activeMock]);
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -149,7 +157,8 @@ function serviceCardHtml(svc) {
   var pill    = statusClass(svc.status);
   var blink   = (svc.status === 'down' || svc.status === 'critical') ? ' svc-pill--blink' : '';
   var history = svc.extra && svc.extra.latency_history;
-  var pillTxt = svc.latency_ms != null ? svc.latency_ms + 'ms' : svc.status.toUpperCase();
+  var sym     = STATUS_SYMBOL[svc.status] || '';
+  var pillTxt = sym + (svc.latency_ms != null ? svc.latency_ms + 'ms' : svc.status.toUpperCase());
 
   var meta1 = svc.p95_ms_24h != null
     ? '<span class="svc-meta__label">p95</span><span class="svc-meta__value">' + svc.p95_ms_24h + 'ms</span>'
@@ -252,6 +261,64 @@ function setText(id, text) {
   if (el) el.textContent = text;
 }
 
+// ── Mocks adicionales ─────────────────────────────────────────────────────────
+
+// Mock 2: 1 servicio warning, 1 critical
+var MOCK_2 = JSON.parse(JSON.stringify(MOCK_DATA));
+MOCK_2.overall_status = 'critical';
+MOCK_2.incidents_open = 2;
+MOCK_2.servers[1].services[0].status = 'warning';   // cedhsinaloa.org.mx warning
+MOCK_2.servers[1].services[0].latency_ms = 1850;
+MOCK_2.servers[1].services[0].p95_ms_24h = 2300;
+MOCK_2.servers[1].services[1].status = 'down';       // suig.cedhsinaloa down
+MOCK_2.servers[1].services[1].latency_ms = null;
+MOCK_2.servers[1].services[1].http_status = null;
+MOCK_2.servers[1].services[1].last_error = 'Connection timeout after 5000ms';
+MOCK_2.servers[1].status = 'critical';
+MOCK_2.recent_incidents = [
+  { id: 'inc-001', started_at: new Date(Date.now() - 4 * 60000).toISOString(), resolved_at: null, status: 'open', severity: 'high', target_type: 'service', target_name: 'suig.cedhsinaloa', summary: 'suig.cedhsinaloa no responde — timeout 5s', first_error: 'Connection timeout' },
+  { id: 'inc-002', started_at: new Date(Date.now() - 18 * 60000).toISOString(), resolved_at: null, status: 'open', severity: 'medium', target_type: 'service', target_name: 'cedhsinaloa.org.mx', summary: 'cedhsinaloa.org.mx latencia elevada >1500ms', first_error: null }
+];
+
+// Mock 3: 1 servidor agent_unreachable
+var MOCK_3 = JSON.parse(JSON.stringify(MOCK_DATA));
+MOCK_3.overall_status = 'warning';
+MOCK_3.incidents_open = 1;
+MOCK_3.servers[2].agent_reachable = false;            // VPS-OIC unreachable
+MOCK_3.servers[2].status = 'down';
+MOCK_3.servers[2].stale = true;
+MOCK_3.servers[2].services.forEach(function(s) { s.status = 'unknown'; s.latency_ms = null; });
+MOCK_3.recent_incidents = [
+  { id: 'inc-003', started_at: new Date(Date.now() - 12 * 60000).toISOString(), resolved_at: null, status: 'open', severity: 'high', target_type: 'agent', target_name: 'vps-oic', summary: 'Agente SSH vps-oic sin respuesta (2 fallos consecutivos)', first_error: 'ssh: connect timeout' }
+];
+
+// Mock 4: certificado SSL crítico (<7d)
+var MOCK_4 = JSON.parse(JSON.stringify(MOCK_DATA));
+MOCK_4.servers[3].ssl[0].days_left = 4;
+MOCK_4.servers[3].ssl[0].status = 'critical';
+MOCK_4.servers[3].ssl[0].expires_at = new Date(Date.now() + 4 * 86400000).toISOString();
+MOCK_4.recent_incidents = [
+  { id: 'inc-004', started_at: new Date(Date.now() - 2 * 3600000).toISOString(), resolved_at: null, status: 'open', severity: 'high', target_type: 'service', target_name: 'mail.cedhsinaloa.org.mx', summary: 'SSL mail.cedhsinaloa.org.mx vence en 4 días — renovar urgente', first_error: null }
+];
+
+// Mock 5: incidente activo nuevo + servicio warning
+var MOCK_5 = JSON.parse(JSON.stringify(MOCK_DATA));
+MOCK_5.overall_status = 'warning';
+MOCK_5.incidents_open = 3;
+MOCK_5.servers[0].metrics.cpu_percent = 87;           // OpenClaw CPU high
+MOCK_5.servers[0].metrics.load_1m = 1.94;
+MOCK_5.servers[0].status = 'warning';
+MOCK_5.servers[3].services[0].status = 'warning';    // mailcow SOGo warning
+MOCK_5.servers[3].services[0].latency_ms = 1200;
+MOCK_5.recent_incidents = [
+  { id: 'inc-005', started_at: new Date(Date.now() - 45000).toISOString(), resolved_at: null, status: 'open', severity: 'high', target_type: 'server', target_name: 'vps-myrock', summary: 'CPU OpenClaw >85% sostenido — carga anómala', first_error: 'load_1m: 1.94 > 2x cores' },
+  { id: 'inc-006', started_at: new Date(Date.now() - 8 * 60000).toISOString(), resolved_at: null, status: 'open', severity: 'medium', target_type: 'service', target_name: 'mailcow.sogo', summary: 'mailcow.sogo latencia >1000ms', first_error: null },
+  { id: 'inc-007', started_at: new Date(Date.now() - 25 * 60000).toISOString(), resolved_at: null, status: 'acknowledged', severity: 'low', target_type: 'service', target_name: 'cedhs.xyz', summary: 'cedhs.xyz http 503 — recuperado', first_error: 'HTTP 503' }
+];
+
+var MOCKS = [MOCK_DATA, MOCK_2, MOCK_3, MOCK_4, MOCK_5];
+var activeMock = 0;
+
 // ── Main loop ─────────────────────────────────────────────────────────────────
 
 var POLL_INTERVAL = 5000;
@@ -289,6 +356,15 @@ function checkOrientation() {
     warn.classList.add('hidden');
   }
 }
+
+// Teclas 1-5 para cambiar mock (solo en desarrollo)
+document.addEventListener('keydown', function(e) {
+  var n = parseInt(e.key);
+  if (n >= 1 && n <= 5) {
+    activeMock = n - 1;
+    tick();
+  }
+});
 
 checkOrientation();
 window.addEventListener('resize', checkOrientation);

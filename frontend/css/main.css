@@ -21,7 +21,7 @@
   --neon-lime:    #c6ff00;
   --neon-cyan:    #00e5ff;
   --neon-magenta: #ff2d95;
-  --neon-orange:  #ff9500;
+  --neon-blue:    #00aaff; /* warning — deutan-safe, reemplaza orange */
 
   /* Texto */
   --text-primary:   #e8e0ee;
@@ -37,7 +37,7 @@
   --glow-lime:    0 0 6px rgba(198,255,0,0.6);
   --glow-cyan:    0 0 6px rgba(0,229,255,0.6);
   --glow-magenta: 0 0 8px rgba(255,45,149,0.7);
-  --glow-orange:  0 0 6px rgba(255,149,0,0.5);
+  --glow-blue:    0 0 6px rgba(0,170,255,0.6);
 
   /* Gaps */
   --gap-xs: 3px;
@@ -95,7 +95,7 @@ body {
 /* ── Utilidades de estado ────────────────────────────────────────────────── */
 
 .status-ok      { color: var(--neon-lime); }
-.status-warn    { color: var(--neon-orange); }
+.status-warn    { color: var(--neon-blue); }
 .status-bad     { color: var(--neon-magenta); }
 .status-unknown { color: var(--text-tertiary); }
 
@@ -328,7 +328,7 @@ body {
 }
 
 .vps-bar__fill.status-ok   { background: var(--neon-lime);    box-shadow: var(--glow-lime); }
-.vps-bar__fill.status-warn { background: var(--neon-orange);  box-shadow: var(--glow-orange); }
+.vps-bar__fill.status-warn { background: var(--neon-blue);    box-shadow: var(--glow-blue); }
 .vps-bar__fill.status-bad  { background: var(--neon-magenta); box-shadow: var(--glow-magenta); }
 
 .vps-agent-down {
@@ -399,7 +399,7 @@ body {
 }
 
 .svc-pill.status-ok      { background: var(--neon-lime);    color: var(--bg-base); box-shadow: var(--glow-lime); }
-.svc-pill.status-warn    { background: var(--neon-orange);  color: var(--bg-base); box-shadow: var(--glow-orange); }
+.svc-pill.status-warn    { background: var(--neon-blue);    color: var(--bg-base); box-shadow: var(--glow-blue); }
 .svc-pill.status-bad     { background: var(--neon-magenta); color: var(--bg-base); box-shadow: var(--glow-magenta); }
 .svc-pill.status-unknown { background: var(--text-tertiary); color: var(--bg-base); }
 

@@ -32,11 +32,16 @@ El dashboard debe sentirse **personal y técnico**, no corporativo. Cuando Jorge
 ### Acentos neón (los 4 colores semánticos)
 
 ```css
---neon-lime: #c6ff00;        /* OK · todo bien · success */
---neon-cyan: #00e5ff;        /* Info · botones · enlaces · sparklines */
+--neon-lime:    #c6ff00;     /* OK · todo bien · success */
+--neon-cyan:    #00e5ff;     /* Info · sparklines · metadatos */
 --neon-magenta: #ff2d95;     /* DOWN · caído · alerta crítica · branding */
---neon-orange: #ff9500;      /* WARNING · degradado · atención */
+--neon-blue:    #00aaff;     /* WARNING · degradado · atención */
 ```
+
+> **Accesibilidad (deuteranopia)**: el operador (Jorge) es deutan. El orange original (#ff9500)
+> era indistinguible del lime para él — ambos aparecen como amarillo-pardo. Se reemplazó por
+> azul (#00aaff), claramente distinguible del amarillo para deutans. Los símbolos ▲ (warning)
+> y ✕ (critical/down) se agregan a las pills para que el estado no dependa únicamente del color.
 
 ### Texto
 
@@ -57,10 +62,10 @@ El dashboard debe sentirse **personal y técnico**, no corporativo. Cuando Jorge
 ### Glow values (sombras de luz)
 
 ```css
---glow-lime: 0 0 6px rgba(198, 255, 0, 0.6);
---glow-cyan: 0 0 6px rgba(0, 229, 255, 0.6);
+--glow-lime:    0 0 6px rgba(198, 255, 0, 0.6);
+--glow-cyan:    0 0 6px rgba(0, 229, 255, 0.6);
 --glow-magenta: 0 0 8px rgba(255, 45, 149, 0.7);
---glow-orange: 0 0 6px rgba(255, 149, 0, 0.5);
+--glow-blue:    0 0 6px rgba(0, 170, 255, 0.6);
 ```
 
 ## Tipografía
@@ -204,11 +209,13 @@ Solo dos:
 ### Status pill
 
 ```css
-.status-ok      { background: var(--neon-lime); color: var(--bg-base); }
-.status-warn    { background: var(--neon-orange); color: var(--bg-base); }
-.status-bad     { background: var(--neon-magenta); color: var(--bg-base); }
+.status-ok      { background: var(--neon-lime);    color: var(--bg-base); }
+.status-warn    { background: var(--neon-blue);     color: var(--bg-base); }  /* azul, deutan-safe */
+.status-bad     { background: var(--neon-magenta);  color: var(--bg-base); }
 .status-unknown { background: var(--text-tertiary); color: var(--bg-base); }
 ```
+
+Pills de warning muestran prefijo `▲`, pills critical/down muestran `✕` para no depender solo del color.
 
 Todos con su correspondiente glow box-shadow. La pill `bad` parpadea cada 1.2s.
 
