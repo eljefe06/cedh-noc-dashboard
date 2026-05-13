@@ -91,8 +91,9 @@ Vive aislado del resto de containers (red propia, volúmenes propios).
 **Container `noc-frontend`** (nginx + html)
 - nginx alpine
 - Sirve `index.html` + assets estáticos
-- Escucha en `100.x.x.x:80`
-- Proxy reverso de `/api/*` hacia `noc-api:8000`
+- Escucha en `100.104.244.83:8080` (Tailscale, no público)
+- Puerto 80 del host ya ocupado por nginx nativo → NOC usa 8080
+- Proxy reverso de `/api/*` → `noc-api:8000` (Fase 3)
 
 **Volume `noc-data`**
 - Persiste `/data/noc.db` (SQLite)

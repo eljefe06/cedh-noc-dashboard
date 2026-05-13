@@ -1,0 +1,30 @@
+services:
+
+  noc-frontend:
+    image: nginx:alpine
+    container_name: noc-frontend
+    restart: unless-stopped
+    ports:
+      - "100.104.244.83:8080:80"   # solo Tailscale — no expuesto en IP pública
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - noc-net
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # noc-api se agrega en Fase 3
+
+networks:
+  noc-net:
+    name: noc-net
+    driver: bridge

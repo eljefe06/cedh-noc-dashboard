@@ -446,6 +446,7 @@ Ver `docs/SECURITY.md` sección "Checklist de seguridad pre-producción".
 - [ ] Audit log de cada acción
 - [ ] Confirmación doble en destructivas
 - [ ] Push notifications a tablet en alertas críticas
+- [ ] Modal de reinicio de VPS (con PIN + confirmación doble)
 
 ---
 
