@@ -197,25 +197,46 @@
 | SSH user NOC | `jyanagui` |
 | Rol en NOC | Monitoreado vía Tailscale — **frágil, no tocar mucho** |
 
-### Servicios que corren aquí
+### Stack Mailcow (18 containers — proyecto `mailcowdockerized`)
 
-Stack Mailcow completo (todos containers Docker):
-- [ ] **Postfix** (SMTP) — puerto 25, 587
-- [ ] **Dovecot** (IMAP) — puerto 993
-- [ ] **Rspamd** (anti-spam)
-- [ ] **SOGo** (webmail)
-- [ ] **Nginx interno de Mailcow**
-- [ ] **MySQL/MariaDB interno**
-- [ ] **Redis interno**
-- [ ] **ClamAV**
-- [ ] **Mailcow admin web**
+| Container | Función | Puertos externos |
+|---|---|---|
+| nginx-mailcow | Reverse proxy + SSL termination | 80, 443 |
+| postfix-mailcow | SMTP | 25, 465, 587 |
+| dovecot-mailcow | IMAP/POP3 | 993, 995, 143, 110 |
+| sogo-mailcow | Webmail SOGo | interno |
+| rspamd-mailcow | Anti-spam | interno |
+| clamd-mailcow | Antivirus ClamAV | interno (healthy) |
+| mysql-mailcow | MariaDB 10.11 | 127.0.0.1:13306 |
+| redis-mailcow | Redis 7.4.6 | 127.0.0.1:7654 |
+| acme-mailcow | Gestor SSL automático | interno |
+| watchdog-mailcow | Monitor interno | interno |
+| unbound-mailcow | DNS resolver | interno (healthy) |
+
+### SSL cert actual
+
+| Dominio | CN | SANs cubiertos | Expira | Días |
+|---|---|---|---|---|
+| mail.cedhsinaloa.org.mx | whm.cedhsinaloa.org.mx | cedhsinaloa.org.mx, mail., webmail., cpanel., whm., www. | 2026-06-29 | ~47d ⚠️ warn pronto |
+
+> Nota: el cert es de cPanel/WHM (no Let's Encrypt). `correo.cedhsinaloa.org.mx` (hostname interno) **no está en los SANs** — solo `mail.` es el acceso público.
+
+### Mailcow config relevante
+
+| Variable | Valor |
+|---|---|
+| MAILCOW_HOSTNAME | `correo.cedhsinaloa.org.mx` |
+| TZ | `America/Mazatlan` |
+| Acceso público | `mail.cedhsinaloa.org.mx` |
 
 ### Bloqueadores antes de monitoreo
 
-- [ ] Confirmar hostname, IP
-- [ ] Confirmar que DNS records (MX, SPF, DMARC) están bien configurados — Jorge tiene pendiente esto
+- [x] Confirmar hostname → correo.cedhsinaloa.org.mx / acceso público: mail.cedhsinaloa.org.mx ✅
+- [x] Tailscale instalado → 100.118.231.85 ✅
+- [x] SSH desde VPS-MyRock funciona ✅
+- [x] SSL cert verificado — expira 2026-06-29 (~47d)
+- [ ] Confirmar DNS records (MX, SPF, DMARC) — Jorge lo tiene pendiente
 - [ ] PTR de IP pública apunta a `mail.cedhsinaloa.org.mx`
-- [ ] Asegurar SSH desde VPS-MyRock funciona
 
 ---
 
@@ -234,8 +255,8 @@ Stack Mailcow completo (todos containers Docker):
 | SIER | `https://sier.cedhsinaloa.org.mx/` | vps-oic ✅ | high | verificado |
 | Declaraciones | `http://declaraciones.cedhsinaloa.org.mx/` | vps-oic ✅ | high | ⚠️ HTTP only |
 | Portal OIC | `https://oic.cedhsinaloa.org.mx/` | vps-oic ✅ | high | verificado |
-| Mailcow SOGo | `https://mail.cedhsinaloa.org.mx/SOGo/` | cedh-mail | high | pendiente |
-| Mailcow admin | `https://mail.cedhsinaloa.org.mx/` | cedh-mail | medium | pendiente |
+| Mailcow SOGo | `https://mail.cedhsinaloa.org.mx/SOGo/` | vps-mail ✅ | high | verificado |
+| Mailcow admin | `https://mail.cedhsinaloa.org.mx/` | vps-mail ✅ | medium | verificado |
 | cedhs.xyz | `https://cedhs.xyz/` | suig-vps | medium | pendiente |
 | MyRock | `https://myrock.com.mx/` | vps-myrock | medium | pendiente |
 | PagoKids | `https://pagokids.com.mx/` | vps-myrock | high | pendiente |

@@ -279,10 +279,12 @@
 
 ### 4.5 Discovery en VPS-Mail
 
-- [ ] Correr `scripts/discovery-v2.sh`
-- [ ] Guardar JSON
-- [ ] Pegar a Jorge para review
-- [ ] Actualizar `docs/INVENTORY.md`
+- [x] Discovery vía SSH completado 2026-05-13
+- [x] Actualizar `INVENTORY.md` con datos reales ✅
+- Stack: mailcowdockerized completo (18 containers), todos Up 24h
+- Hostname interno: correo.cedhsinaloa.org.mx / público: mail.cedhsinaloa.org.mx
+- SSL cPanel/WHM cert — expira 2026-06-29 (~47d, entra en warning ~2026-05-30)
+- Postfix: 25, 465, 587 / Dovecot: 993, 995
 
 ### 4.6 Verificación de health endpoints
 
