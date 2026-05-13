@@ -246,22 +246,24 @@
 > - `high`: caída impacta operación CEDH directamente
 > - `medium`: caída es molesta pero no operacional
 > - `low`: experimental o personal
+>
+> **Nota mail**: Mailcow está detrás de NAT. El collector lo checa vía Tailscale (100.118.231.85) desde VPS-MyRock — no por internet público.
 
-| Servicio | URL para check | Servidor | Criticidad | Estado |
-|---|---|---|---|---|
-| cedhsinaloa.org.mx | `https://cedhsinaloa.org.mx/` | vps-suig ✅ | high | verificado |
-| SUIG | `https://suig.cedhsinaloa.org.mx/` | vps-suig ✅ | high | verificado |
-| Buzón Electrónico | `https://buzon.cedhsinaloa.org.mx/` | vps-suig ✅ | high | verificado |
-| SIER | `https://sier.cedhsinaloa.org.mx/` | vps-oic ✅ | high | verificado |
-| Declaraciones | `http://declaraciones.cedhsinaloa.org.mx/` | vps-oic ✅ | high | ⚠️ HTTP only |
-| Portal OIC | `https://oic.cedhsinaloa.org.mx/` | vps-oic ✅ | high | verificado |
-| Mailcow SOGo | `https://mail.cedhsinaloa.org.mx/SOGo/` | vps-mail ✅ | high | verificado |
-| Mailcow admin | `https://mail.cedhsinaloa.org.mx/` | vps-mail ✅ | medium | verificado |
-| cedhs.xyz | `https://cedhs.xyz/` | suig-vps | medium | pendiente |
-| MyRock | `https://myrock.com.mx/` | vps-myrock | medium | pendiente |
-| PagoKids | `https://pagokids.com.mx/` | vps-myrock | high | pendiente |
-| ChatRock | `https://___/` | vps-myrock | low | pendiente |
-| Naibi Concept Store | `https://___/` | vps-myrock | low | pendiente |
+| Servicio | URL check (collector) | Servidor | Criticidad | HTTP OK | Notas |
+|---|---|---|---|---|---|
+| cedhsinaloa.org.mx | `https://cedhsinaloa.org.mx/` | vps-suig | high | 200 ✅ | Cloudflare CDN |
+| SUIG | `https://suig.cedhsinaloa.org.mx/` | vps-suig | high | 200 ✅ | Cloudflare CDN |
+| Buzón Electrónico | `https://buzon.cedhsinaloa.org.mx/` | vps-suig | high | 404 ⚠️ | Root 404 normal — app necesita auth |
+| SIER | `https://sier.cedhsinaloa.org.mx/` | vps-oic | high | 302→200 ✅ | Redirect a login |
+| Declaraciones | `https://declaraciones.cedhsinaloa.org.mx/` | vps-oic | high | 200 ✅ | HTTP→HTTPS redirect OK |
+| Portal OIC | `https://oic.cedhsinaloa.org.mx/` | vps-oic | high | 200 ✅ | |
+| Mailcow SOGo | `http://100.118.231.85/SOGo/` | vps-mail | high | 301 ✅ | Vía Tailscale — no acceso público |
+| SMTP 587 | `100.118.231.85:587` STARTTLS | vps-mail | high | ESMTP ✅ | Vía Tailscale |
+| IMAP 993 | `100.118.231.85:993` TLS | vps-mail | high | OK ✅ | Vía Tailscale |
+| Mailcow admin | `http://100.118.231.85/` | vps-mail | medium | 301 ✅ | Vía Tailscale |
+| MyRock | `https://myrock.com.mx/` | vps-myrock | medium | 200 ✅ | |
+| PagoKids | `https://pagokids.com.mx/` | vps-myrock | high | 200 ✅ | |
+| cedhs.xyz | `https://cedhs.xyz/` | vps-suig | medium | pendiente | |
 
 ---
 

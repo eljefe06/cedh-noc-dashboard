@@ -288,9 +288,12 @@
 
 ### 4.6 Verificación de health endpoints
 
-- [ ] Listar todos los servicios HTTP a monitorear
-- [ ] Para cada uno: verificar si `/health` existe o si hay que crearlo
-- [ ] Decidir con Jorge cuáles agregar (puede ser bloqueador)
+- [x] Verificados todos los servicios HTTP 2026-05-13
+- Ninguno tiene /health dedicado (excepto pagokids que devuelve la home con 200)
+- Estrategia: checar URL raíz, aceptar 2xx/3xx como OK
+- Buzón: root da 404 (esperado, app requiere auth) → checar con expected_status=404
+- Mail SOGo/SMTP/IMAP: vía Tailscale desde VPS-MyRock (100.118.231.85)
+- declaraciones: HTTP redirige a HTTPS — HTTPS funcional ✅
 
 ### 4.7 noc-readonly-shell
 
