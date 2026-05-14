@@ -79,53 +79,53 @@
 - [x] Crear `frontend/css/main.css`
 - [x] Crear `frontend/mock-data/status.json`
 - [x] Crear `frontend/assets/fonts/` con JetBrains Mono
-- [ ] Crear `frontend/js/render-incidents.js` (bloque prominente de incidentes activos)
-- [ ] Crear `frontend/js/render-services.js` (chips de servicios)
-- [ ] Crear `frontend/js/render-infra.js` (VPS cards compactas)
-- [ ] Crear `frontend/js/render-panels.js` (paneles operativos)
-- [ ] Crear `frontend/js/duration.js` (formateo "14m", "2h 18m")
-- [ ] Actualizar `frontend/js/status-colors.js`
+- [x] Crear `frontend/js/render-incidents.js` (bloque prominente de incidentes activos)
+- [x] Crear `frontend/js/render-services.js` (chips de servicios)
+- [x] Crear `frontend/js/render-infra.js` (VPS cards compactas)
+- [x] Crear `frontend/js/render-panels.js` (paneles operativos)
+- [x] Crear `frontend/js/duration.js` (formateo "14m", "2h 18m")
+- [x] Actualizar `frontend/js/status-colors.js`
 
 ### 1.2 Implementación visual (layout operativo v2)
 
-- [ ] **Status bar**: 3 contadores grandes (crítico, advertencia, ok) + uptime/hora
-- [ ] Contador crítico parpadea (`pulse-crit`) cuando >0
-- [ ] **Bloque incidentes activos** con border-left 4px del color de severidad
-- [ ] Tag UPPERCASE de severidad en cada incidente
-- [ ] Título humano (13px) + descripción (11px secondary)
-- [ ] Línea de diagnóstico con `→ ` cyan
-- [ ] Duración prominente (18px) a la derecha
-- [ ] Badge de impacto explícito ("Afecta usuarios públicos", etc.)
-- [ ] **Sección "// servicios públicos"** con 8 chips compactos
-- [ ] Border-top 3px del color de estado en cada chip (sin pill)
-- [ ] **Sección "// infraestructura"** con 4 VPS cards horizontales
-- [ ] Stats inline: `cpu N  ram N  dsk N`, color cambia si warn/crit
-- [ ] Sin barras de progreso
-- [ ] **Paneles operativos** (3 columnas): últimos cambios, certificados, pendientes hoy
-- [ ] Footer con Tailscale status
-- [ ] Scanlines en fondo del screen
+- [x] **Status bar**: 3 contadores grandes (crítico, advertencia, ok) + uptime/hora
+- [x] Contador crítico parpadea (`pulse-crit`) cuando >0
+- [x] **Bloque incidentes activos** con border-left 4px del color de severidad
+- [x] Tag UPPERCASE de severidad en cada incidente
+- [x] Título humano (13px) + descripción (11px secondary)
+- [x] Línea de diagnóstico con `→ ` cyan
+- [x] Duración prominente (18px) a la derecha
+- [x] Badge de impacto explícito ("Afecta usuarios públicos", etc.)
+- [x] **Sección "// servicios públicos"** con 8 chips compactos
+- [x] Border-top 3px del color de estado en cada chip (sin pill)
+- [x] **Sección "// infraestructura"** con 4 VPS cards horizontales
+- [x] Stats inline: `cpu N  ram N  dsk N`, color cambia si warn/crit
+- [x] Sin barras de progreso
+- [x] **Paneles operativos** (3 columnas): últimos cambios, certificados, pendientes hoy
+- [x] Footer con Tailscale status
+- [x] Scanlines en fondo del screen
 
 ### 1.3 Estados especiales
 
-- [ ] Sin incidentes activos: mensaje compacto verde `✓ Sin incidentes activos`
-- [ ] API sin respuesta: overlay sin reemplazar último estado conocido
-- [ ] Portrait: mensaje `↻ ROTA LA TABLET A HORIZONTAL`
+- [x] Sin incidentes activos: mensaje compacto verde `✓ Sin incidentes activos`
+- [x] API sin respuesta: overlay sin reemplazar último estado conocido
+- [x] Portrait: mensaje `↻ ROTA LA TABLET A HORIZONTAL`
 
 ### 1.4 Lógica de datos
 
-- [ ] Polling cada 5 segundos a `/api/v1/status`
-- [ ] Calcular contadores del header desde los datos (crítico/advertencia/ok por tipo)
-- [ ] Recalcular `duration_human` cliente-side cada poll
-- [ ] Re-render diff básico (no parpadeo)
-- [ ] Detectar orientación de pantalla
+- [x] Polling cada 5 segundos a `/api/v1/status`
+- [x] Calcular contadores del header desde los datos (crítico/advertencia/ok por tipo)
+- [x] Recalcular `duration_human` cliente-side cada poll
+- [x] Re-render diff básico (no parpadeo)
+- [x] Detectar orientación de pantalla
 
 ### 1.5 Mocks v2
 
-- [ ] Mock 1: todo OK (estado vacío visible)
-- [ ] Mock 2: 1 critical + 1 warning (como el preview)
-- [ ] Mock 3: servidor agent_unreachable
-- [ ] Mock 4: SSL crítico (<7d) → aparece como incidente
-- [ ] Mock 5: deploy reciente correlacionado con fallo
+- [x] Mock 1: todo OK (estado vacío visible)
+- [x] Mock 2: 1 critical + 1 warning (como el preview)
+- [x] Mock 3: servidor agent_unreachable
+- [x] Mock 4: SSL crítico (<7d) → aparece como incidente
+- [x] Mock 5: RAM crítica en MyRock (warning + recomendación)
 
 ### 1.6 Validación
 
@@ -228,7 +228,7 @@
 
 - [x] API devuelve datos reales 4/4 servidores ✅
 - [x] Frontend carga datos reales en tablet ✅
-- [~] Frontend muestra diseño v2 — **pendiente Phase 1 rebuild**
+- [x] Frontend muestra diseño v2 — **Phase 1 completada 2026-05-13**
 - [ ] Validar en Tab A8 con diseño v2 completo
 
 ---
@@ -293,7 +293,7 @@
 ## Bloqueadores actuales
 
 - [ ] **Incident generator incompleto** — incidentes abiertos no tienen title/description/diagnosis. Bloquea la utilidad real del bloque de incidentes en el frontend v2.
-- [ ] **Frontend v2 no implementado** — tablet muestra diseño v1 viejo. Bloquea experiencia operativa completa.
+- [x] ~~**Frontend v2 no implementado**~~ — implementado 2026-05-13, desplegado en VPS-MyRock.
 - [ ] **myrock.com.mx SSL vence 2026-05-29** — renovar antes del 2026-05-22 (7 días de margen).
 
 ---
