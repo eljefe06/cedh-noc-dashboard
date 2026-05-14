@@ -31,13 +31,14 @@ services:
       dockerfile: Dockerfile
     container_name: noc-api
     restart: unless-stopped
+    user: "0"   # root — needed to read the SSH key mounted from /root/.ssh; V1 behind Tailscale
     env_file: .env
     volumes:
       - noc-data:/data
       # Mock data — seeded into SQLite cache on startup (overwritten by real collectors)
       - ./frontend/mock-data:/app/frontend/mock-data:ro
       # SSH key for connecting to the 4 VPS — must exist on VPS-MyRock before deploy
-      - /root/.ssh/noc_collector_ed25519:/home/nocapi/.ssh/noc_collector_ed25519:ro
+      - /root/.ssh/noc_collector_ed25519:/root/.ssh/noc_collector_ed25519:ro
     networks:
       - noc-net
     logging:
