@@ -1,23 +1,14 @@
-export const STATUS_CLASS = {
-  ok:       'status-ok',
-  warning:  'status-warn',
-  critical: 'status-bad',
-  down:     'status-bad',
-  unknown:  'status-unknown',
+const STATUS_CLS = {
+  ok:       'ok',
+  warning:  'warn',
+  critical: 'crit',
+  down:     'crit',
+  unknown:  '',
 };
 
-export const STATUS_COLOR = {
-  ok:       'var(--neon-lime)',
-  warning:  'var(--neon-orange)',
-  critical: 'var(--neon-magenta)',
-  down:     'var(--neon-magenta)',
-  unknown:  'var(--text-tertiary)',
-};
+function statusCls(s) { return STATUS_CLS[s] || ''; }
 
-export function statusClass(status) {
-  return STATUS_CLASS[status] ?? 'status-unknown';
-}
-
-export function statusColor(status) {
-  return STATUS_COLOR[status] ?? 'var(--text-tertiary)';
-}
+const SEV_TAG  = { critical: 'CRÍTICO', warning: 'ADVERTENCIA' };
+const SEV_CLS  = { critical: 'crit',    warning: 'warn' };
+function sevTag(sv) { return SEV_TAG[sv] || sv.toUpperCase(); }
+function sevCls(sv) { return SEV_CLS[sv] || 'warn'; }
