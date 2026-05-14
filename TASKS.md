@@ -10,7 +10,7 @@
 >
 > Cada tarea completada debe marcarse en el mismo commit que la implementa.
 >
-> Última actualización: 2026-05-13 (Phase 3 backend completa, Tab A8 Tailscale instalado)
+> Última actualización: 2026-05-14
 
 ---
 
@@ -19,364 +19,217 @@
 ### 0.1 Documentación base
 
 - [x] Crear `README.md`
-- [x] Crear `docs/PROJECT.md`
-- [x] Crear `docs/ARCHITECTURE.md`
-- [x] Crear `docs/INVENTORY.md`
-- [x] Crear `docs/API_CONTRACT.md`
-- [x] Crear `docs/DESIGN.md`
-- [x] Crear `docs/SECURITY.md`
-- [x] Crear `docs/CONVENTIONS.md`
-- [x] Crear `docs/GLOSSARY.md`
+- [x] Crear `PROJECT.md`
+- [x] Crear `ARCHITECTURE.md`
+- [x] Crear `INVENTORY.md`
+- [x] Crear `API_CONTRACT.md`
+- [x] Crear `DESIGN.md`
+- [x] Crear `SECURITY.md`
+- [x] Crear `CONVENTIONS.md`
+- [x] Crear `GLOSSARY.md`
 - [x] Crear `CLAUDE.md`
-- [x] Crear `docs/TASKS.md` (este archivo)
+- [x] Crear `TASKS.md` (este archivo)
 
 ### 0.2 Cuenta de Tailscale
 
-- [x] Crear cuenta en tailscale.com (auth con Google o GitHub)
+- [x] Crear cuenta en tailscale.com
 - [x] Verificar plan free (hasta 100 dispositivos)
 - [x] Definir nombre del tailnet → `taild92bae.ts.net`
-- [~] Configurar ACL inicial — dejada en default; refinar cuando haya devices con tags (Fase 0.3+)
+- [~] Configurar ACL inicial — default por ahora; refinar cuando haya tags
 - [x] Activar MagicDNS
 
 ### 0.3 Tailscale en VPS-MyRock
 
-- [x] SSH a srv1386238 con credenciales actuales
-- [x] Instalar Tailscale: `curl -fsSL https://tailscale.com/install.sh | sh` → v1.98.1
+- [x] SSH a srv1386238
+- [x] Instalar Tailscale → v1.98.1
 - [x] Conectar: `tailscale up`
-- [x] Anotar IP Tailscale asignada → `100.104.244.83`
-- [x] Actualizar `docs/INVENTORY.md` con la IP Tailscale real
-- [x] Probar `ping` interno a la IP Tailscale desde el mismo host → 0.093ms, 0% loss
+- [x] IP Tailscale asignada → `100.104.244.83`
+- [x] Actualizar `INVENTORY.md` con la IP Tailscale real
+- [x] Ping interno verificado
 
 ### 0.4 Tailscale en Tab A8
 
-- [x] Esperar que termine actualización de Android
 - [x] Play Store → instalar Tailscale Android
 - [x] Login con mismo usuario que VPS-MyRock
-- [x] Tab A8 aparece en tailnet → `galaxy-tab-a8` / `100.121.75.52`
-- [x] Dashboard visible desde Tab A8 en `http://100.104.244.83:8080` ✅
+- [x] Tab A8 en tailnet → `galaxy-tab-a8` / `100.121.75.52`
+- [x] Dashboard visible desde Tab A8 ✅
 
 ### 0.5 Inicializar repositorio
 
 - [x] `git init` en local
-- [x] Crear `.gitignore` con: `.env`, `*.key`, `*.pem`, `noc.db`, `__pycache__/`, `node_modules/`, `.venv/`
+- [x] Crear `.gitignore`
 - [x] Primer commit con docs completas
-- [x] Crear repo remoto → https://github.com/eljefe06/cedh-noc-dashboard (privado)
+- [x] Repo remoto → https://github.com/eljefe06/cedh-noc-dashboard (privado)
 - [x] Push inicial
-- [x] Configurar branch protection en `main` (require PR review)
+- [x] Branch protection en `main`
 
 ---
 
-## FASE 1 · Frontend mock funcional
+## FASE 1 · Frontend v2 (diseño operativo)
 
-> Objetivo: Tener un dashboard navegable con datos ficticios que se ve **idéntico** a como debe verse en producción. Sin backend real.
+> Objetivo: Implementar el dashboard con el diseño operativo v2 — el que responde las 4 preguntas.
+> El frontend v1 existe pero usa el diseño viejo (uniformidad democrática). Esta fase lo reemplaza.
+>
+> **Referencia visual**: `frontend/dashboardv2.html` en el repo.
 
 ### 1.1 Estructura del frontend
 
-- [ ] Crear carpeta `frontend/`
-- [ ] Crear `frontend/index.html` con estructura semántica vacía
-- [ ] Crear `frontend/css/main.css` con variables CSS de `docs/DESIGN.md`
-- [ ] Crear `frontend/js/main.js` (entry point)
-- [ ] Crear `frontend/js/api.js` (capa de fetch)
-- [ ] Crear `frontend/js/render.js` (lógica de renderizado)
-- [ ] Crear `frontend/js/sparkline.js` (SVG sparklines)
-- [ ] Crear `frontend/js/status-colors.js` (mapeo estado → CSS class)
-- [ ] Crear `frontend/mock-data/status.json` con ejemplo del contrato
-- [ ] Descargar e incluir JetBrains Mono local en `frontend/assets/fonts/`
+- [x] Crear carpeta `frontend/`
+- [x] Crear `frontend/index.html`
+- [x] Crear `frontend/css/main.css`
+- [x] Crear `frontend/mock-data/status.json`
+- [x] Crear `frontend/assets/fonts/` con JetBrains Mono
+- [ ] Crear `frontend/js/render-incidents.js` (bloque prominente de incidentes activos)
+- [ ] Crear `frontend/js/render-services.js` (chips de servicios)
+- [ ] Crear `frontend/js/render-infra.js` (VPS cards compactas)
+- [ ] Crear `frontend/js/render-panels.js` (paneles operativos)
+- [ ] Crear `frontend/js/duration.js` (formateo "14m", "2h 18m")
+- [ ] Actualizar `frontend/js/status-colors.js`
 
-### 1.2 Implementación visual
+### 1.2 Implementación visual (layout operativo v2)
 
-- [ ] Layout horizontal completo (header + top row + services grid + bottom row + footer)
-- [ ] Header con pulse animado y métricas globales
-- [ ] VPS cards (4 cards) con métricas CPU/RAM/DISK/NET y barras de progreso
-- [ ] Service cards (8 cards) con status pill, sparkline, metadata
-- [ ] Bottom panel: logs (con tags coloreados)
-- [ ] Bottom panel: SSL expirations
-- [ ] Bottom panel: git deploys recientes
-- [ ] Footer con Tailscale status y versión
-- [ ] HUD brackets en esquinas de cards y panels
-- [ ] Scanlines sutiles en fondo
-- [ ] Glow real con box-shadow en colores neón
-- [ ] Animaciones: pulse (header) y blink (servicio caído)
-- [ ] Estado vacío para paneles sin datos
-- [ ] Mensaje "rota la tablet a horizontal" si portrait
+- [ ] **Status bar**: 3 contadores grandes (crítico, advertencia, ok) + uptime/hora
+- [ ] Contador crítico parpadea (`pulse-crit`) cuando >0
+- [ ] **Bloque incidentes activos** con border-left 4px del color de severidad
+- [ ] Tag UPPERCASE de severidad en cada incidente
+- [ ] Título humano (13px) + descripción (11px secondary)
+- [ ] Línea de diagnóstico con `→ ` cyan
+- [ ] Duración prominente (18px) a la derecha
+- [ ] Badge de impacto explícito ("Afecta usuarios públicos", etc.)
+- [ ] **Sección "// servicios públicos"** con 8 chips compactos
+- [ ] Border-top 3px del color de estado en cada chip (sin pill)
+- [ ] **Sección "// infraestructura"** con 4 VPS cards horizontales
+- [ ] Stats inline: `cpu N  ram N  dsk N`, color cambia si warn/crit
+- [ ] Sin barras de progreso
+- [ ] **Paneles operativos** (3 columnas): últimos cambios, certificados, pendientes hoy
+- [ ] Footer con Tailscale status
+- [ ] Scanlines en fondo del screen
 
-### 1.3 Lógica de datos mock
+### 1.3 Estados especiales
 
-- [ ] Cargar `mock-data/status.json` en cada poll
-- [ ] Implementar polling cada 5 segundos
-- [ ] Renderizar status completo en primer load
-- [ ] Re-render solo elementos cambiados (diff básico)
-- [ ] Manejar errores de carga con overlay "API SIN RESPUESTA"
-- [ ] Calcular `overall_status` correctamente según reglas del contrato
-- [ ] Mapear estados a clases CSS correctamente
-- [ ] Mostrar sparklines con datos del mock (array de números)
-- [ ] Mostrar incidents con tiempos relativos ("hace 4m")
+- [ ] Sin incidentes activos: mensaje compacto verde `✓ Sin incidentes activos`
+- [ ] API sin respuesta: overlay sin reemplazar último estado conocido
+- [ ] Portrait: mensaje `↻ ROTA LA TABLET A HORIZONTAL`
 
-### 1.4 Variaciones de mock
+### 1.4 Lógica de datos
 
-- [ ] Mock 1: todo OK
-- [ ] Mock 2: 1 servicio warning, 1 critical
-- [ ] Mock 3: 1 servidor agent_unreachable
-- [ ] Mock 4: certificado SSL crítico (<7d)
-- [ ] Mock 5: incidente activo nuevo
-- [ ] Script local que rota entre mocks cada 30s para preview
+- [ ] Polling cada 5 segundos a `/api/v1/status`
+- [ ] Calcular contadores del header desde los datos (crítico/advertencia/ok por tipo)
+- [ ] Recalcular `duration_human` cliente-side cada poll
+- [ ] Re-render diff básico (no parpadeo)
+- [ ] Detectar orientación de pantalla
 
-### 1.5 Validación local
+### 1.5 Mocks v2
 
-- [ ] Abrir `frontend/index.html` directo en Chrome desktop
-- [ ] Verificar que se ve idéntico al diseño aprobado
-- [ ] Verificar polling funciona y re-renders no parpadean
-- [ ] Validar accesibilidad básica (Lighthouse)
-- [ ] Probar con throttling de red 3G slow para ver carga inicial
+- [ ] Mock 1: todo OK (estado vacío visible)
+- [ ] Mock 2: 1 critical + 1 warning (como el preview)
+- [ ] Mock 3: servidor agent_unreachable
+- [ ] Mock 4: SSL crítico (<7d) → aparece como incidente
+- [ ] Mock 5: deploy reciente correlacionado con fallo
+
+### 1.6 Validación
+
+- [ ] Abrir en Chrome desktop — verificar idéntico a `dashboardv2.html`
+- [ ] Verificar en Tab A8 real
+- [ ] Duración de incidente sube cliente-side correctamente
 
 ---
 
 ## FASE 2 · Tailscale + Deploy del mock en VPS-MyRock
 
-> Objetivo: Ver el dashboard mock **en la Tab A8 real** vía Tailscale.
+### 2.1–2.3 Docker + nginx
 
-### 2.1 Preparar nginx en VPS-MyRock
-
-- [x] Identificar si nginx existente puede agregar virtual host → no conveniente (nginx nativo en 0.0.0.0:80)
-- [x] Crear nginx específico en `noc-stack` (contenedor Docker)
-- [x] Configurar bind explícito a IP Tailscale → `100.104.244.83:8080` (8080 porque 80 ya ocupado)
-- [x] Verificar UFW: NOC no expuesto en IP pública ✓
-
-### 2.2 Docker Compose para noc-stack (mock-only)
-
-- [x] Crear `docker-compose.yml` en raíz del repo
-- [x] Service `noc-frontend`: nginx alpine sirviendo `frontend/`
-- [x] Volúmenes: montar `frontend/` read-only
-- [x] Red: docker network propia `noc-net`
-- [x] Restart policy: `unless-stopped`
-- [x] Logging driver: json-file con rotación
-
-### 2.3 Deploy del mock
-
-- [x] Clonar repo en VPS-MyRock → `/opt/noc`
-- [x] `docker compose up -d noc-frontend` → HTTP 200 OK
-- [x] Verificar que escucha en IP Tailscale → `100.104.244.83:8080`
-- [x] Probar desde Mac con Tailscale → dashboard visible ✓
+- [x] nginx en Docker bind a IP Tailscale `100.104.244.83:8080`
+- [x] `docker-compose.yml` con noc-frontend
+- [x] Deploy del frontend en `/opt/noc` en VPS-MyRock
 
 ### 2.4 Configurar Tab A8
 
-- [ ] Instalar Fully Kiosk Browser (gratis para uso básico)
-- [ ] Configurar URL inicial: `http://100.x.x.x`
-- [ ] Activar fullscreen mode
-- [ ] Bloquear orientación en landscape
-- [ ] Wakelock: pantalla siempre encendida
-- [ ] Auto-restart en 4 AM
-- [ ] Prevenir descarga y enlaces externos
-- [ ] Configurar modo desarrollador Android: mantener encendido al cargar
-- [ ] Brillo entre 35-50%
-- [ ] Bloquear notificaciones del sistema
+- [x] Instalar Fully Kiosk Browser
+- [x] URL: `http://100.104.244.83:8080`
+- [x] Fullscreen landscape
+- [x] Wakelock encendido
+- [ ] Auto-restart a las 4 AM
+- [ ] Brillo 35-50% configurado
 
 ### 2.5 Validación en hardware real
 
-- [ ] Abrir dashboard en Tab A8
-- [ ] Validar contraste y legibilidad en condiciones reales de oficina
-- [ ] Validar que no se calienta la tablet con uso prolongado (1h)
-- [ ] Validar que polling no consume batería excesivamente
-- [ ] Validar densidad visual a distancia normal de monitor
-- [ ] Fotos del setup final para documentación
+- [~] Dashboard carga en Tab A8 ✅ (verificado con datos reales)
+- [ ] Validar contraste y legibilidad en oficina
+- [ ] Validar temperatura tablet 1h
+- [ ] Fotos del setup final
 
 ---
 
 ## FASE 3 · Backend FastAPI con datos mock
 
-> Objetivo: Reemplazar el JSON estático con una API FastAPI que aún devuelve datos mock pero estructurados correctamente.
-
-### 3.1 Estructura del backend
-
-- [x] Crear carpeta `backend/`
-- [x] Crear `pyproject.toml` con dependencies (fastapi, uvicorn, pydantic, pydantic-settings, httpx, asyncssh, cryptography, sqlite3 stdlib)
-- [x] Crear estructura: `app/`, `tests/`, `Dockerfile`
-- [x] Crear `.env.example` con todas las variables
-- [x] Crear `backend/app/__init__.py`
-
-### 3.2 Modelos Pydantic
-
-- [x] Crear `app/models.py` con todos los tipos del contrato (con Field validators ge/le en Metrics)
-- [x] Status, Server, Service, SslCert, Backup, Deploy, DnsCheck, Incident, DockerInfo, DockerContainer
-- [x] Tests: 9 tests pasando (test_models.py)
-
-### 3.3 Config
-
-- [x] Crear `app/config.py` con `Settings` de pydantic-settings
-- [x] Cargar desde `.env`
-- [x] Properties helpers: `cors_origins_list`, `dns_resolvers_list`
-
-### 3.4 App FastAPI mínima
-
-- [x] Crear `app/main.py` con FastAPI + lifespan
-- [x] Middleware: CORS desde IPs configuradas en .env
-- [x] Router `/api/v1`
-- [x] Endpoint `GET /api/v1/health`
-- [x] Endpoint `GET /api/v1/status` — sirve mock desde cache SQLite (seeded en startup)
-- [x] Endpoints `/api/v1/incidents/recent`, `/incidents/open`, `/dns`
-
-### 3.5 Storage SQLite
-
-- [x] Crear `app/storage.py` con wrapper
-- [x] Schema: tablas `events`, `incidents`, `metric_snapshots`, `status_cache`
-- [x] Migrations simples al startup
-- [x] Funciones: cache_get/set, incident_open/resolve, incidents_recent/open
-
-### 3.6 Containerizar
-
-- [x] `backend/Dockerfile` multi-stage Python 3.11.10-slim-bookworm
-- [x] Usuario no-root (nocapi uid 1001)
-- [x] Health check del container
-- [x] Agregar `noc-api` a `docker-compose.yml`
-- [x] Nginx del frontend proxy `/api/*` → `noc-api:8000`
-- [ ] Verificar imagen pesa <200MB (pendiente build en VPS)
-
-### 3.7 Frontend → API
-
-- [x] `frontend/js/app.js` → llama `/api/v1/status` cuando protocol === 'http:'
-- [x] Fallback automático a mocks cuando protocol === 'file:'
-- [~] **Probar end-to-end: tablet → nginx → api → JSON** (pendiente deploy en VPS)
+- [x] `backend/` con FastAPI + uvicorn + Pydantic v2
+- [x] `app/models.py` — todos los tipos del contrato
+- [x] `app/config.py` — pydantic-settings
+- [x] `app/main.py` — FastAPI + lifespan + scheduler
+- [x] `app/storage.py` — SQLite (incidents, cache, events)
+- [x] `app/routers/status.py` — endpoints `/api/v1/status`, `/health`, `/incidents/*`, `/dns`
+- [x] `backend/Dockerfile` multi-stage, usuario root (V1)
+- [x] noc-api en `docker-compose.yml`, nginx proxy `/api/` → noc-api
+- [x] Frontend llama `/api/v1/status` cuando protocol=http
 
 ---
 
 ## FASE 4 · Discovery completo
 
-> Objetivo: Tener datos reales de los 3 VPS faltantes y actualizar el inventario.
-
-### 4.1 Script discovery v2
-
-- [ ] Tomar el script v2 que Jorge va a entregar (mejorado del v1)
-- [ ] Colocarlo en `scripts/discovery-v2.sh`
-- [ ] Documentar uso en cabecera del script
-- [ ] Probar en VPS-MyRock con v2 (sobrescribe el v1 anterior)
-
-### 4.2 SSH desde VPS-MyRock hacia los otros 3
-
-- [x] Generar llave dedicada `noc_collector_ed25519` en VPS-MyRock
-- [x] Copiar llave pública a VPS-SUIG `authorized_keys` (root@187.124.152.86) ✅
-- [x] Copiar llave pública a VPS-OIC `authorized_keys` (root@31.220.58.97) ✅
-- [x] Copiar llave pública a VPS-Mail `authorized_keys` (jyanagui@100.118.231.85 via Tailscale) ✅
-- [x] Probar SSH desde VPS-MyRock → 3/3 OK
-- [ ] Configurar SSH config con ControlMaster en VPS-MyRock
-
-### 4.3 Discovery en VPS-SUIG
-
-- [x] Discovery vía SSH completado 2026-05-13
-- [x] Actualizar `INVENTORY.md` con datos reales ✅
-- Proyectos: suig-cedh, cedh-sinaloa, evolution-api (v1 interno)
-- Dominios: cedhsinaloa.org.mx, suig., buzon. (todos en vps-suig)
-- [ ] Verificar SSL de suig. y buzon. subdomains
-- [ ] Confirmar cedhs.xyz
-
-### 4.4 Discovery en VPS-OIC
-
-- [x] Discovery vía SSH completado 2026-05-13
-- [x] Actualizar `INVENTORY.md` con datos reales ✅
-- Proyectos: sistema-declaraciones, sier, denuncia-oic, oic
-- Dominios: declaraciones., oic., sier.cedhsinaloa.org.mx
-- PM2: oic-portal, oic-api, oic-panel (15d uptime)
-- ⚠️ declaraciones.cedhsinaloa.org.mx sin SSL — pendiente informar a Jorge
-
-### 4.5 Discovery en VPS-Mail
-
-- [x] Discovery vía SSH completado 2026-05-13
-- [x] Actualizar `INVENTORY.md` con datos reales ✅
-- Stack: mailcowdockerized completo (18 containers), todos Up 24h
-- Hostname interno: correo.cedhsinaloa.org.mx / público: mail.cedhsinaloa.org.mx
-- SSL cPanel/WHM cert — expira 2026-06-29 (~47d, entra en warning ~2026-05-30)
-- Postfix: 25, 465, 587 / Dovecot: 993, 995
-
-### 4.6 Verificación de health endpoints
-
-- [x] Verificados todos los servicios HTTP 2026-05-13
-- Ninguno tiene /health dedicado (excepto pagokids que devuelve la home con 200)
-- Estrategia: checar URL raíz, aceptar 2xx/3xx como OK
-- Buzón: root da 404 (esperado, app requiere auth) → checar con expected_status=404
-- Mail SOGo/SMTP/IMAP: vía Tailscale desde VPS-MyRock (100.118.231.85)
-- declaraciones: HTTP redirige a HTTPS — HTTPS funcional ✅
-
-### 4.7 noc-readonly-shell
-
-- [ ] Crear script en `scripts/noc-readonly-shell`
-- [ ] Instalar en los 3 VPS monitoreados
-- [ ] Configurar `command=` en `authorized_keys`
-- [ ] Probar que solo comandos permitidos funcionan
-- [ ] Documentar lista de comandos permitidos
+- [x] Llave SSH dedicada `noc_collector_ed25519` generada en VPS-MyRock
+- [x] Llave copiada a VPS-SUIG (root@187.124.152.86) ✅
+- [x] Llave copiada a VPS-OIC (root@31.220.58.97) ✅
+- [x] Llave copiada a VPS-Mail (jyanagui@100.118.231.85 vía Tailscale) ✅
+- [x] Llave agregada al propio VPS-MyRock authorized_keys ✅ (2026-05-14)
+- [x] Discovery VPS-SUIG completado → INVENTORY.md actualizado
+- [x] Discovery VPS-OIC completado → INVENTORY.md actualizado
+- [x] Discovery VPS-Mail completado → Tailscale instalado → INVENTORY.md actualizado
+- [x] Health endpoints verificados en todos los servicios
+- [ ] Configurar SSH ControlMaster en VPS-MyRock
+- [ ] noc-readonly-shell (script de shell restringido para los VPS monitoreados)
 
 ---
 
 ## FASE 5 · Collectors reales
 
-> Objetivo: Reemplazar mocks con datos reales, collector por collector.
+> Collectors implementados y corriendo. API devuelve datos reales de 4/4 servidores.
 
-### 5.1 Collector base
+### 5.1–5.6 Collectors implementados ✅
 
-- [x] Crear `app/collectors/base.py` — CheckResult, MetricsResult, DockerResult dataclasses
-- [x] Worker async (scheduler.py) con poll intervals por tipo de check
-- [x] Cache en SQLite via cache_set — escrita al final de cada ciclo
-- [x] Persistencia de transiciones en SQLite (incident_open/resolve)
+- [x] `app/collectors/base.py` — CheckResult, MetricsResult, DockerResult
+- [x] `app/collectors/http.py` — check_http, check_smtp_starttls, check_imap_tls
+- [x] `app/collectors/ssh_metrics.py` — asyncssh + python3 one-liner (cpu/ram/disk/net/uptime)
+- [x] `app/collectors/ssl.py` — TLS cert check, calcula días restantes
+- [x] `app/collectors/dns.py` — dnspython: mx, spf, dmarc, a, ptr
+- [x] `app/collectors/docker_ssh.py` — docker ps via SSH, state/health/uptime
+- [x] `app/service_config.py` — 4 servidores, todos los servicios, SSL domains, DNS checks
+- [x] `app/scheduler.py` — asyncio polling: HTTP 15s, metrics/docker 60s, SSL 6h, DNS 1h
+- [x] `app/aggregator.py` — overall_status y server_status según reglas del contrato
 
-### 5.2 HTTP Collector
+### 5.7–5.8 Collectors diferidos
 
-- [x] Crear `app/collectors/http.py`
-- [x] `check_http(url, ...) → CheckResult` — latency + status code combinados
-- [x] `check_smtp_starttls`, `check_imap_tls` — protocolos de correo
-- [x] Conectado a todos los servicios HTTP de INVENTORY.md vía service_config.py
+- [ ] `app/collectors/backups.py` — diferido a V1.5
+- [ ] `app/collectors/deploys.py` — diferido a V1.5
 
-### 5.3 SSL Collector
+### 5.9 Status aggregator + Incident generator
 
-- [x] Crear `app/collectors/ssl.py`
-- [x] `check_ssl(domain) → SslCert dict` — usa cryptography para parsear DER cert
-- [x] Calcula días restantes, status ok/warning/critical/down según umbrales
-- [x] Iterar sobre lista de dominios de INVENTORY.md (en service_config.py)
-
-### 5.4 DNS Collector
-
-- [x] Crear `app/collectors/dns.py`
-- [x] `check_dns(type, domain, expected)` — usando dnspython
-- [x] Checks: mx, spf, dmarc, a, ptr
-- [x] Checks SMTP/IMAP en http.py
-- [x] DNS checks de INVENTORY.md en service_config.py
-
-### 5.5 SSH Collector
-
-- [x] Crear `app/collectors/ssh_metrics.py`
-- [x] `collect_metrics(host, user, key_path)` — asyncssh + python3 one-liner en el servidor
-- [x] Mide: cpu_percent, ram_percent, disk_percent, load, uptime, net_rx/tx (1s sample)
-- [~] Probar en VPS-SUIG, VPS-OIC, VPS-Mail — pendiente deploy
-
-### 5.6 Docker Collector (V1)
-
-- [x] Crear `app/collectors/docker_ssh.py`
-- [x] `collect_docker(host, user, key_path)` — tab-delimited docker ps via SSH
-- [x] Parser: state, health (de status string), uptime, compose project
-- [~] Probar en servidores reales — pendiente deploy
-
-### 5.7 Backups Collector — diferido a V1.5
-
-### 5.8 Deploys Collector — diferido a V1.5
-
-### 5.9 Status aggregator
-
-- [x] Crear `app/aggregator.py`
-- [x] `overall_status()` — aplica las 7 reglas del contrato
-- [x] `server_status()` — aplica las 5 reglas del contrato
-- [x] `build_status_response()` — genera el StatusResponse completo
-- [x] Tests de las reglas con casos del contrato ✅
+- [x] Reglas de `overall_status` (7 reglas del contrato) — con tests
+- [x] Reglas de `server.status` (5 reglas del contrato) — con tests
+- [x] Incident open/resolve básico (transición ok↔down/critical)
+- [ ] **Incident generator con campos humanos** (title, description, diagnosis, impact_label)
+  - [ ] Tabla de mapeo error técnico → campos humanos (ver API_CONTRACT.md)
+  - [ ] Diagnóstico contextual: correlacionar señales entre checks
+  - [ ] Anti-flapping: warning sostenido >5 min antes de incidente
+  - [ ] Cálculo de `duration_human` desde `started_at`
+- [ ] Tests de la matriz completa de mapeos de incidente
 
 ### 5.10 End-to-end con datos reales
 
-- [~] Deploy en VPS-MyRock — pendiente: git pull + docker compose up --build
-- [ ] Frontend muestra estado real
-- [ ] Validar en Tab A8
-
-### 5.11 Cambios de deploy requeridos
-
-- [ ] `git pull` en VPS-MyRock en `/opt/noc`
-- [ ] Actualizar `.env`: cambiar `SSH_KEY_PATH=/home/nocapi/.ssh/noc_collector_ed25519`
-- [ ] `docker compose up -d --build noc-api` (rebuild por nuevo Dockerfile)
-- [ ] Verificar logs: `docker compose logs -f noc-api`
-- [ ] Verificar que el scheduler arranca y los collectors corren
+- [x] API devuelve datos reales 4/4 servidores ✅
+- [x] Frontend carga datos reales en tablet ✅
+- [~] Frontend muestra diseño v2 — **pendiente Phase 1 rebuild**
+- [ ] Validar en Tab A8 con diseño v2 completo
 
 ---
 
@@ -384,94 +237,73 @@
 
 ### 6.1 Hardening
 
-- [ ] Bearer token en `.env`, validado en cada request
-- [ ] Rate limiting básico (no más de 60 reqs/min por IP)
+- [ ] Rate limiting (60 reqs/min por IP)
 - [ ] Logs estructurados JSON
-- [ ] Log redaction de secrets
 - [ ] Backup nightly de SQLite
 
-### 6.2 Observability del propio NOC
+### 6.2 Observability del NOC
 
-- [ ] Health endpoint robusto que verifica: collectors corriendo, DB accesible, último check exitoso
-- [ ] Métricas internas: cuántos checks por minuto, latencia de cada collector
-- [ ] Self-monitoring: si un collector falla 3 veces, generar incidente
+- [ ] Health endpoint robusto (verifica collectors + DB + último check)
+- [ ] Self-monitoring: 3 fallos consecutivos → incidente
 
 ### 6.3 Documentación operativa
 
-- [ ] `docs/OPERATIONS.md`: cómo redeployar, cómo agregar servicio, cómo rotar llaves
-- [ ] `docs/TROUBLESHOOTING.md`: errores comunes y soluciones
-- [ ] README final actualizado
-
-### 6.4 Checklist final pre-producción
-
-Ver `docs/SECURITY.md` sección "Checklist de seguridad pre-producción".
+- [ ] `OPERATIONS.md`: cómo redeployar, agregar servicio, rotar llaves
+- [ ] `TROUBLESHOOTING.md`: errores comunes y soluciones
 
 ---
 
 ## FASE 7 (V1.5) · Módulo Docker enriquecido
 
-- [ ] Lectura completa de containers con `docker inspect`
 - [ ] CPU/RAM por container con `docker stats`
 - [ ] Detección de containers `unhealthy` y propagación a servicios
-- [ ] Vista detallada Docker por servidor
 
 ---
 
 ## FASE 8 (V2) · Drill-down y logs en vivo
 
 - [ ] Vista detallada por servicio (modal)
-- [ ] Gráficas históricas 24h por servicio
+- [ ] Gráficas históricas 24h
 - [ ] WebSocket para logs en streaming
-- [ ] Heatmap 5xx por hora
 - [ ] DKIM check
 
 ---
 
 ## FASE 9 (V3) · Acciones protegidas
 
-- [ ] PIN local para activar modo acciones
-- [ ] TOTP como segundo factor
+- [ ] PIN + TOTP para activar modo acciones
 - [ ] Endpoints `POST /api/v1/action/*`
-- [ ] Whitelist estricta de acciones permitidas
-- [ ] Audit log de cada acción
-- [ ] Confirmación doble en destructivas
 - [ ] Push notifications a tablet en alertas críticas
-- [ ] Modal de reinicio de VPS (con PIN + confirmación doble)
 
 ---
 
 ## Decisiones tomadas durante la implementación
 
-> Sección viva. Se agrega cada decisión no obvia con fecha y contexto.
-
-- **2026-05-12**: Confirmado que SUIG, OIC y Mailcow corren en Docker. El módulo Docker queda en V1 (no V1.5).
-- **2026-05-12**: VPS-MyRock (srv1386238) tiene 2 cores con load ~1.0, se ajustan polling intervals a 15s/60s para no saturar.
-- **2026-05-12**: Tailscale elegido como red privada en lugar de Cloudflare Access por simplicidad.
-- **2026-05-12**: Opción A (SSH desde noc-api hacia VPS monitoreados, sin instalar agentes) elegida por mínima invasividad.
+- **2026-05-12**: Confirmado que SUIG, OIC y Mailcow corren en Docker. Módulo Docker en V1.
+- **2026-05-12**: VPS-MyRock tiene 2 cores con load ~1.0 — polling 15s/60s para no saturar.
+- **2026-05-12**: Tailscale elegido sobre Cloudflare Access por simplicidad.
+- **2026-05-12**: Opción A (SSH desde noc-api, sin agentes) por mínima invasividad.
+- **2026-05-13**: **Rediseño operativo del frontend.** El primer prototipo era "estética pura" — uniformidad democrática, métricas sin diagnóstico. Se rediseña para responder 4 preguntas operativas. Ver `DESIGN.md`.
+- **2026-05-13**: **API_CONTRACT extendido**: `Incident` ahora incluye `title`, `description`, `diagnosis`, `impact_label`, `duration_human`. El aggregator genera estos campos desde fallos técnicos.
+- **2026-05-14**: noc-api corre como root (uid 0) en Docker para leer SSH key en /root/.ssh. V1 aceptable tras Tailscale.
+- **2026-05-14**: myrock.com.mx SSL vence 2026-05-29 (~15 días) — **renovar antes de esa fecha**.
 
 ---
 
 ## Bloqueadores actuales
 
-> Cosas que impiden avanzar. Resolver antes de progresar.
-
-- [ ] **Dominios OIC no confirmados** (declaraciones, denuncias, ser-cedh) — bloquea Fase 5.2 para esos servicios
-- [ ] **No confirmado si `/health` existe en cada sistema** — puede bloquear Fase 4.6
-- [ ] **SERVERS_CONFIG en .env** del VPS necesita actualizarse con IPs/users reales antes de Phase 5
+- [ ] **Incident generator incompleto** — incidentes abiertos no tienen title/description/diagnosis. Bloquea la utilidad real del bloque de incidentes en el frontend v2.
+- [ ] **Frontend v2 no implementado** — tablet muestra diseño v1 viejo. Bloquea experiencia operativa completa.
+- [ ] **myrock.com.mx SSL vence 2026-05-29** — renovar antes del 2026-05-22 (7 días de margen).
 
 ---
 
 ## Backlog (ideas no priorizadas)
 
-> Se agregan aquí; cuando se decida implementar, se mueve a fase numerada.
-
-- Status page público separado de cedhsinaloa.org.mx
-- Integración con WhatsApp via Evolution API para alertas críticas
+- Integración con WhatsApp vía Evolution API para alertas críticas
 - Auto-rotación de llaves SSH del NOC cada 6 meses
-- Dashboard para PagoKids con métricas específicas (transacciones/min, errores Stripe)
-- Métricas de SUIG: quejas por hora, distribución por visitador (sería un dashboard distinto)
-- Export de incidentes a CSV/PDF para reportes
-- Modo "demo" del NOC para mostrar a colegas sin exponer datos reales
-- Detección automática de cambios en infraestructura (nuevo container, nuevo dominio SSL, etc.)
-- Integración con Cloudflare API para purge automático cuando se detecte stale cache
-- Mobile-responsive view (en otro dispositivo, no la tablet)
+- Dashboard para PagoKids: transacciones/min, errores
+- Export de incidentes a CSV/PDF
+- Modo demo sin datos reales
+- Detección automática de cambios en infra (nuevo container, nuevo dominio)
+- Mobile-responsive para ver desde celular fuera de oficina

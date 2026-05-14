@@ -41,6 +41,27 @@ Jorge maneja 4 servidores con servicios críticos institucionales y comerciales:
 
 Es **explícitamente personal** y técnico. Si más adelante se comparte, será con una versión separada y autorizada.
 
+## Filosofía de diseño operativo (cerrada)
+
+> Aprendido del primer prototipo: el dashboard debe servir al problema, no a la estética.
+
+El dashboard responde **4 preguntas operativas**, en este orden de prioridad:
+
+1. **¿Está bien?** — Visible en 3 segundos al voltear la tablet
+2. **¿Qué pasó?** — Si algo está mal, título humano del problema
+3. **¿A quién afecta?** — Badge explícito de impacto
+4. **¿Qué hago?** — Diagnóstico y acción sugerida, no metric raw
+
+Cualquier elemento visual que no responda una de estas preguntas es ruido y debe eliminarse o reubicarse a vista detallada (V2).
+
+### Anti-patrones documentados
+
+- ❌ **Uniformidad democrática**: cards de igual tamaño cuando importan distinto
+- ❌ **Estética sobre función**: visuales cool que no comunican jerarquía
+- ❌ **Métricas puras sin diagnóstico**: "CPU 12%" no le dice a nadie qué hacer
+- ❌ **Mezclar capas** (infra y servicios): un VPS sano ≠ servicio público funcionando
+- ❌ **Tiempos pequeños**: duración del incidente debe ser prominente
+
 ## Decisiones de diseño cerradas
 
 ### Arquitectura

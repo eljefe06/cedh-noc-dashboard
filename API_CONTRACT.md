@@ -136,9 +136,24 @@ interface Incident {
   severity: "high" | "medium" | "low";
   target_type: "service" | "server" | "agent" | "dns";
   target_name: string;
-  summary: string;
-  first_error: string | null;
+
+  // Campos de presentación humana (V1 operativo)
+  title: string;              // Título humano en español, ej: "PagoKids no responde correctamente"
+  description: string;        // Contexto: qué se observa, qué responde y qué no
+  diagnosis: string;          // Diagnóstico probable y acción sugerida (después del →)
+  impact_label: ImpactLabel;  // Badge de impacto
+
+  // Campos técnicos
+  first_error: string | null; // Error técnico crudo (HTTP code, exception, etc)
+  duration_seconds: number;   // Cuánto lleva activo (calculado en cada update)
+  duration_human: string;     // Formato amigable: "14m", "2h 18m", "3d 4h"
 }
+
+type ImpactLabel =
+  | "Afecta usuarios públicos"
+  | "Afecta operación interna"
+  | "Sin impacto operativo"
+  | "Solo monitoreo";
 
 interface DockerInfo {
   available: boolean;
@@ -246,7 +261,24 @@ GET  /api/v1/health                  → health de la API central misma
     }
   ],
   "dns_checks": [],
-  "recent_incidents": []
+  "recent_incidents": [
+    {
+      "id": "inc_20260512_201432",
+      "started_at": "2026-05-12T20:14:32-07:00",
+      "resolved_at": null,
+      "status": "open",
+      "severity": "high",
+      "target_type": "service",
+      "target_name": "pagokids",
+      "title": "PagoKids no responde correctamente",
+      "description": "Cloudflare devuelve 520. El VPS MyRock está vivo y otros servicios responden normal.",
+      "diagnosis": "Probable: problema entre Cloudflare y el origen. Revisar nginx del contenedor pagokids-web y logs.",
+      "impact_label": "Afecta usuarios públicos",
+      "first_error": "HTTP 520 Cloudflare",
+      "duration_seconds": 840,
+      "duration_human": "14m"
+    }
+  ]
 }
 ```
 
@@ -259,6 +291,45 @@ Si la API central no puede contactar un servidor (SSH falla):
 2. Devuelve último estado conocido con timestamp claro
 3. Genera incidente automático tras N=2 fallos consecutivos
 4. Frontend muestra el servidor con indicador específico de "agente caído"
+
+---
+
+## Generación de incidentes con diagnóstico
+
+El aggregator (en backend) es responsable de transformar fallos técnicos en incidentes con presentación humana. Esto es **lógica de la API**, no del frontend.
+
+### Reglas de generación
+
+Cuando un check transiciona a estado `critical` o `down`, el aggregator:
+
+1. Crea entrada en tabla `incidents` con `status: open`
+2. Llena los campos humanos según **mapeo por tipo de error**:
+
+| Error técnico | title | description | diagnosis | impact_label |
+|---|---|---|---|---|
+| HTTP 5xx | `{servicio} no responde correctamente` | `Servidor devuelve {code}. {servidor host} está {status}.` | `Revisar logs del contenedor {servicio}-{role} y nginx.` | `Afecta usuarios públicos` si criticality=high |
+| HTTP timeout | `{servicio} no responde` | `Timeout tras {N}s. {servidor host} está {status}.` | `Verificar que el servicio está vivo (docker ps) y nginx escucha.` | según criticality |
+| Cloudflare 520 | `{servicio} no responde correctamente` | `Cloudflare devuelve 520. El VPS está vivo.` | `Probable: problema entre Cloudflare y origen. Revisar nginx del contenedor {servicio}-web.` | `Afecta usuarios públicos` |
+| HTTP 301 inesperado | `{servicio} redirige inesperadamente` | `Devuelve 301 en lugar de 200. Servicio funcional pero comportamiento inesperado.` | `Verificar si fue cambio intencional. Revisar config y logs.` | `Sin impacto operativo` |
+| SSH falla | `Agente {servidor} no responde` | `No se pudo establecer conexión SSH. El servidor puede estar caído o haber rechazado la conexión.` | `Verificar estado del servidor en panel del proveedor.` | `Solo monitoreo` |
+| SSL <7d | `Certificado {dominio} vence en {N} días` | `Let's Encrypt vence el {fecha}.` | `Renovar manualmente con certbot o esperar renovación automática.` | según criticality del servicio |
+| DNS missing | `Falta registro {tipo} en {dominio}` | `No se encontró registro {tipo} consultando {resolver}.` | `Verificar configuración DNS en proveedor.` | `Afecta operación interna` |
+| Disco >90% | `{servidor} casi sin espacio` | `Disco al {N}%, quedan {M} GB.` | `Limpiar logs, backups viejos o expandir volumen.` | `Solo monitoreo` |
+
+### Diagnóstico contextual (usa otros checks)
+
+El diagnóstico debe **correlacionar señales**. Ejemplo:
+- Si servicio HTTP devuelve 520 **Y** ping al VPS host responde **Y** otros servicios del mismo VPS responden → diagnosis: "problema entre Cloudflare y el origen"
+- Si servicio HTTP devuelve timeout **Y** ping al VPS host **falla** → diagnosis: "VPS host inalcanzable; problema de infraestructura"
+- Si servicio HTTP devuelve 5xx **Y** deploy reciente en mismo repo → diagnosis: "deploy reciente ({sha}) puede haber introducido el problema; revisar logs post-deploy"
+
+Esta lógica de correlación vive en `app/aggregator.py` con tests específicos.
+
+### Cuándo NO generar incidente
+
+- Transiciones `warning → ok` no generan incidente
+- Transiciones `ok → warning` generan incidente solo si la métrica está en warning por >5 minutos sostenidos (anti-flapping)
+- Servicios con `criticality: low` solo generan incidente al pasar a `down`, no a `warning`
 
 ---
 

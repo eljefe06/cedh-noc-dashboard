@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>CEDH NOC v2 — operativo</title>
+<style>
+body { margin: 0; padding: 20px; background: #050505; font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, monospace; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+.v2-frame { background: #0a0a0a; border-radius: 18px; padding: 14px; max-width: 1280px; width: 100%; }
+.v2-screen { background: #0a0612; border-radius: 6px; overflow: hidden; aspect-ratio: 16/10; display: flex; flex-direction: column; color: #e8e0ee; font-family: inherit; }
+.v2-camera { width: 6px; height: 6px; background: #1a1a1a; border-radius: 50%; margin: 0 auto 6px; }
+
+.v2-status-bar { background: linear-gradient(90deg, #2a0a14 0%, #14081c 100%); padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ff2d95; }
+.v2-status-summary { display: flex; align-items: center; gap: 18px; }
+.v2-summary-label { font-size: 9px; color: #a89cb4; text-transform: uppercase; letter-spacing: 2px; }
+.v2-counter { display: flex; align-items: baseline; gap: 6px; font-weight: 500; }
+.v2-counter .num { font-size: 22px; line-height: 1; }
+.v2-counter.crit .num { color: #ff2d95; text-shadow: 0 0 12px #ff2d95; animation: v2-pulse-crit 1s infinite; }
+.v2-counter.warn .num { color: #ff9500; }
+.v2-counter.ok .num { color: #c6ff00; }
+.v2-counter .label { font-size: 10px; color: #a89cb4; text-transform: uppercase; letter-spacing: 1px; }
+@keyframes v2-pulse-crit { 0%,100% { opacity: 1; } 50% { opacity: 0.5; } }
+.v2-status-meta { display: flex; gap: 16px; font-size: 10px; color: #a89cb4; text-transform: uppercase; letter-spacing: 1px; }
+.v2-status-meta strong { color: #c6ff00; font-weight: 500; }
+
+.v2-incidents { padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; }
+.v2-incident { background: #1a0810; border-left: 4px solid #ff2d95; padding: 10px 14px; display: grid; grid-template-columns: 1fr auto; gap: 14px; }
+.v2-incident.warn { background: #1a1208; border-left-color: #ff9500; }
+.v2-inc-tag { display: inline-block; background: #ff2d95; color: #0a0612; font-size: 9px; font-weight: 500; padding: 2px 6px; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 4px; }
+.v2-incident.warn .v2-inc-tag { background: #ff9500; }
+.v2-inc-title { font-size: 13px; font-weight: 500; color: #e8e0ee; margin: 0 0 4px; }
+.v2-inc-desc { font-size: 11px; color: #a89cb4; margin: 0 0 6px; line-height: 1.4; }
+.v2-inc-diag { font-size: 10px; color: #00e5ff; margin: 0; line-height: 1.4; }
+.v2-inc-diag::before { content: "→ "; color: #c6ff00; font-weight: 500; }
+.v2-inc-right { text-align: right; display: flex; flex-direction: column; gap: 4px; align-items: flex-end; min-width: 140px; }
+.v2-inc-since { font-size: 10px; color: #a89cb4; text-transform: uppercase; letter-spacing: 1px; }
+.v2-inc-duration { font-size: 18px; font-weight: 500; color: #ff2d95; font-variant-numeric: tabular-nums; }
+.v2-incident.warn .v2-inc-duration { color: #ff9500; }
+.v2-inc-impact { font-size: 9px; color: #ff2d95; text-transform: uppercase; letter-spacing: 1px; padding: 2px 6px; border: 1px solid #ff2d95; margin-top: 2px; }
+.v2-incident.warn .v2-inc-impact { color: #ff9500; border-color: #ff9500; }
+
+.v2-section-title { font-size: 9px; color: #7a6890; text-transform: uppercase; letter-spacing: 2px; padding: 0 14px; margin: 4px 0 6px; display: flex; align-items: center; gap: 8px; }
+.v2-section-title::after { content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, #2a1838 0%, transparent 100%); }
+
+.v2-services-strip { padding: 0 12px; display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px; margin-bottom: 4px; }
+.v2-svc { background: #110820; border: 1px solid #2a1838; padding: 6px 8px; display: flex; flex-direction: column; gap: 3px; border-top: 3px solid #c6ff00; }
+.v2-svc.warn { border-top-color: #ff9500; }
+.v2-svc.crit { border-top-color: #ff2d95; }
+.v2-svc-name { font-size: 10px; color: #e8e0ee; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.v2-svc-meta { font-size: 9px; color: #7a6890; font-variant-numeric: tabular-nums; }
+.v2-svc.crit .v2-svc-meta { color: #ff2d95; }
+.v2-svc.warn .v2-svc-meta { color: #ff9500; }
+
+.v2-infra { padding: 0 12px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 6px; }
+.v2-vps { background: #0d0518; border: 1px solid #2a1838; padding: 6px 10px; display: flex; align-items: center; gap: 10px; }
+.v2-vps-status { width: 8px; height: 8px; border-radius: 50%; background: #c6ff00; box-shadow: 0 0 6px #c6ff00; flex-shrink: 0; }
+.v2-vps-info { flex: 1; min-width: 0; }
+.v2-vps-name { font-size: 10px; color: #e8e0ee; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 500; }
+.v2-vps-stats { font-size: 9px; color: #7a6890; font-variant-numeric: tabular-nums; display: flex; gap: 8px; }
+.v2-vps-stat-warn { color: #ff9500; }
+
+.v2-bottom { padding: 0 12px 8px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; flex: 1; min-height: 0; }
+.v2-panel { background: #050208; border: 1px solid #1a0d28; padding: 8px 12px; overflow: hidden; }
+.v2-panel-title { font-size: 9px; color: #c6ff00; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 6px; font-weight: 500; }
+.v2-line { font-size: 10px; padding: 2px 0; display: flex; justify-content: space-between; gap: 8px; font-variant-numeric: tabular-nums; }
+.v2-line-key { color: #e8e0ee; }
+.v2-line-val { color: #7a6890; }
+.v2-line-val.warn { color: #ff9500; }
+.v2-line-val.crit { color: #ff2d95; }
+.v2-line-val.ok { color: #c6ff00; }
+.v2-line-time { color: #5a4870; min-width: 50px; }
+.v2-log-line { font-size: 10px; padding: 2px 0; display: flex; gap: 6px; color: #e8e0ee; }
+.v2-log-tag { min-width: 56px; }
+.v2-log-tag.err { color: #ff2d95; }
+.v2-log-tag.ok { color: #c6ff00; }
+.v2-log-tag.info { color: #00e5ff; }
+
+.v2-footer { background: #14081c; padding: 5px 14px; display: flex; justify-content: space-between; font-size: 9px; color: #7a6890; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #2a1838; }
+.v2-footer strong { color: #c6ff00; font-weight: 500; }
+.bezel-bottom { text-align: center; margin-top: 8px; font-size: 10px; color: #333; letter-spacing: 2px; }
+</style>
+</head>
+<body>
+<div class="v2-frame">
+  <div class="v2-camera"></div>
+  <div class="v2-screen">
+    <div class="v2-status-bar">
+      <div class="v2-status-summary">
+        <span class="v2-summary-label">ESTADO GLOBAL</span>
+        <div class="v2-counter crit"><span class="num">1</span><span class="label">crítico</span></div>
+        <div class="v2-counter warn"><span class="num">1</span><span class="label">advertencia</span></div>
+        <div class="v2-counter ok"><span class="num">11</span><span class="label">correctos</span></div>
+      </div>
+      <div class="v2-status-meta">
+        <span>uptime <strong>14d 06:42</strong></span>
+        <span>10:42:18</span>
+      </div>
+    </div>
+
+    <div class="v2-incidents">
+      <div class="v2-incident">
+        <div>
+          <span class="v2-inc-tag">CRÍTICO</span>
+          <p class="v2-inc-title">PagoKids no responde correctamente</p>
+          <p class="v2-inc-desc">Cloudflare devuelve 520. El VPS MyRock está vivo y otros servicios responden normal.</p>
+          <p class="v2-inc-diag">Probable: problema entre Cloudflare y el origen. Revisar nginx del contenedor pagokids-web y logs.</p>
+        </div>
+        <div class="v2-inc-right">
+          <span class="v2-inc-since">caído desde</span>
+          <span class="v2-inc-duration">14m</span>
+          <span class="v2-inc-impact">Afecta usuarios públicos</span>
+        </div>
+      </div>
+      <div class="v2-incident warn">
+        <div>
+          <span class="v2-inc-tag">ADVERTENCIA</span>
+          <p class="v2-inc-title">Mailcow webmail redirige 301</p>
+          <p class="v2-inc-desc">SOGo responde con redirect en lugar de 200. Servicio sigue funcional pero comportamiento inesperado.</p>
+          <p class="v2-inc-diag">Verificar si fue cambio intencional reciente. Revisar Mailcow config y logs nginx-mailcow.</p>
+        </div>
+        <div class="v2-inc-right">
+          <span class="v2-inc-since">desde</span>
+          <span class="v2-inc-duration">2h 18m</span>
+          <span class="v2-inc-impact">Sin impacto operativo</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="v2-section-title">// servicios públicos</div>
+    <div class="v2-services-strip">
+      <div class="v2-svc"><div class="v2-svc-name">cedhsinaloa</div><div class="v2-svc-meta">340ms · 200</div></div>
+      <div class="v2-svc"><div class="v2-svc-name">suig</div><div class="v2-svc-meta">142ms · 200</div></div>
+      <div class="v2-svc"><div class="v2-svc-name">buzón</div><div class="v2-svc-meta">98ms · 200</div></div>
+      <div class="v2-svc"><div class="v2-svc-name">declaraciones</div><div class="v2-svc-meta">215ms · 200</div></div>
+      <div class="v2-svc"><div class="v2-svc-name">denuncias</div><div class="v2-svc-meta">187ms · 200</div></div>
+      <div class="v2-svc warn"><div class="v2-svc-name">mailcow</div><div class="v2-svc-meta">redirect 301</div></div>
+      <div class="v2-svc crit"><div class="v2-svc-name">pagokids</div><div class="v2-svc-meta">CF 520</div></div>
+      <div class="v2-svc"><div class="v2-svc-name">myrock</div><div class="v2-svc-meta">89ms · 200</div></div>
+    </div>
+
+    <div class="v2-section-title">// infraestructura</div>
+    <div class="v2-infra">
+      <div class="v2-vps"><span class="v2-vps-status"></span><div class="v2-vps-info"><div class="v2-vps-name">openclaw</div><div class="v2-vps-stats"><span>cpu 12</span><span>ram 48</span><span>dsk 34</span></div></div></div>
+      <div class="v2-vps"><span class="v2-vps-status"></span><div class="v2-vps-info"><div class="v2-vps-name">suig-vps</div><div class="v2-vps-stats"><span>cpu 34</span><span class="v2-vps-stat-warn">ram 71</span><span>dsk 52</span></div></div></div>
+      <div class="v2-vps"><span class="v2-vps-status"></span><div class="v2-vps-info"><div class="v2-vps-name">vps-oic</div><div class="v2-vps-stats"><span>cpu 18</span><span>ram 54</span><span>dsk 41</span></div></div></div>
+      <div class="v2-vps"><span class="v2-vps-status"></span><div class="v2-vps-info"><div class="v2-vps-name">cedh-mail</div><div class="v2-vps-stats"><span>cpu 8</span><span>ram 62</span><span>dsk 28</span></div></div></div>
+    </div>
+
+    <div class="v2-bottom">
+      <div class="v2-panel">
+        <p class="v2-panel-title">// últimos cambios</p>
+        <div class="v2-log-line"><span class="v2-line-time">10:38</span><span class="v2-log-tag info">deploy</span><span>suig-api · main · 4a8f12c</span></div>
+        <div class="v2-log-line"><span class="v2-line-time">10:24</span><span class="v2-log-tag ok">backup</span><span>suig db · 412 MB</span></div>
+        <div class="v2-log-line"><span class="v2-line-time">09:15</span><span class="v2-log-tag info">deploy</span><span>cedh-web · main · b91ee03</span></div>
+        <div class="v2-log-line"><span class="v2-line-time">08:42</span><span class="v2-log-tag info">deploy</span><span>ser-cedh · main · 712f88a</span></div>
+        <div class="v2-log-line"><span class="v2-line-time">07:30</span><span class="v2-log-tag err">incident</span><span>buzón timeout (resuelto)</span></div>
+      </div>
+      <div class="v2-panel">
+        <p class="v2-panel-title">// certificados</p>
+        <div class="v2-line"><span class="v2-line-key">mail.cedhsinaloa</span><span class="v2-line-val warn">12 días</span></div>
+        <div class="v2-line"><span class="v2-line-key">cedhsinaloa.org.mx</span><span class="v2-line-val ok">68 días</span></div>
+        <div class="v2-line"><span class="v2-line-key">suig.cedhsinaloa</span><span class="v2-line-val ok">68 días</span></div>
+        <div class="v2-line"><span class="v2-line-key">cedhs.xyz</span><span class="v2-line-val ok">81 días</span></div>
+        <div class="v2-line"><span class="v2-line-key">declara.cedh</span><span class="v2-line-val ok">45 días</span></div>
+      </div>
+      <div class="v2-panel">
+        <p class="v2-panel-title">// pendientes hoy</p>
+        <div class="v2-line"><span class="v2-line-key">renovar SSL mailcow</span><span class="v2-line-val warn">vence 12d</span></div>
+        <div class="v2-line"><span class="v2-line-key">revisar PagoKids 520</span><span class="v2-line-val crit">activo 14m</span></div>
+        <div class="v2-line"><span class="v2-line-key">verificar redirect Mailcow</span><span class="v2-line-val warn">2h 18m</span></div>
+        <div class="v2-line"><span class="v2-line-key">backup mailcow nightly</span><span class="v2-line-val ok">hace 18h</span></div>
+      </div>
+    </div>
+
+    <div class="v2-footer">
+      <span>// tailscale.mesh <strong>ONLINE</strong> · jorge@udiys</span>
+      <span>refresh 5s · v0.2-operativo</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>
