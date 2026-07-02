@@ -10,13 +10,16 @@ from app.collectors.base import CheckResult
 
 
 def _latency_status(ms: int | None) -> str:
+    """Slowness alone is at most a warning — availability decides critical/down.
+
+    Thresholds calibrated for checks that traverse the public internet
+    (Culiacán → Hetzner/Hostinger EU adds ~150-300ms baseline).
+    """
     if ms is None:
         return "down"
-    if ms < 500:
+    if ms < 1500:
         return "ok"
-    if ms < 2000:
-        return "warning"
-    return "critical"
+    return "warning"
 
 
 def _http_status_to_check_status(code: int, ok_codes: set[int]) -> str:
