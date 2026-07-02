@@ -231,6 +231,20 @@
 - [x] Frontend muestra diseño v2 — **Phase 1 completada 2026-05-13**
 - [ ] Validar en Tab A8 con diseño v2 completo
 
+### 5.11 Tuning anti-falsos-positivos
+
+> Auditoría 2026-07-02: Jorge reporta "muchos falsos positivos". Causa raíz: cero
+> tolerancia a fallos transitorios (1 blip = down + incidente) amplificada por
+> SSH cada 5s y umbrales de latencia agresivos.
+
+- [x] **A. Flap damping**: `dampen_status()` en scheduler — down/critical requiere 2 ciclos consecutivos; recovery inmediato; cold start muestra `unknown`, no rojo
+- [x] **B. Gate de métricas**: `_collect_server` respeta `do_metrics` (bug: SSH corría cada ciclo HTTP en vez de cada 60s); fallo SSH conserva últimas métricas buenas
+- [x] **C. Umbrales de latencia**: lentitud sola ya no genera critical (ok <1500ms, warning ≥1500ms); solo indisponibilidad real produce critical/down
+- [x] **D. Cierre robusto de incidentes**: resuelven al volver a ok **o** warning (antes solo `== ok` → incidentes eternos si el servicio quedaba lento)
+- [x] Damping aplicado también a `agent_reachable` (1 blip SSH ya no tira el server card a DOWN)
+- [x] Tests: 13 casos nuevos en `test_damping.py` (22/22 verdes)
+- [ ] Observar 1 semana en producción y recalibrar `_CONFIRM_FAILS`/umbral si hace falta
+
 ---
 
 ## FASE 6 · Producción
@@ -287,6 +301,7 @@
 - **2026-05-13**: **API_CONTRACT extendido**: `Incident` ahora incluye `title`, `description`, `diagnosis`, `impact_label`, `duration_human`. El aggregator genera estos campos desde fallos técnicos.
 - **2026-05-14**: noc-api corre como root (uid 0) en Docker para leer SSH key en /root/.ssh. V1 aceptable tras Tailscale.
 - **2026-05-14**: myrock.com.mx SSL vence 2026-05-29 (~15 días) — **renovar antes de esa fecha**.
+- **2026-07-02**: **Filosofía anti-falsos-positivos**: un check individual nunca decide solo — down/critical requiere confirmación (2 ciclos); la latencia degrada como máximo a warning (disponibilidad manda); recovery nunca se retrasa, solo las alarmas. El estado crudo se conserva en `extra.raw_status` para debugging.
 
 ---
 

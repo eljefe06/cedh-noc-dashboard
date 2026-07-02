@@ -34,9 +34,35 @@ log = logging.getLogger("noc.scheduler")
 
 _TICK = 5  # main loop wakeup interval (seconds)
 
+# Flap damping: consecutive bad cycles required before down/critical is
+# confirmed. With poll_interval_http=15s this means ~30s of sustained
+# failure before the dashboard goes red / an incident opens.
+_CONFIRM_FAILS = 2
+
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def dampen_status(target: str, raw_status: str, damp: dict) -> str:
+    """
+    Flap damping for check statuses.
+
+    A target only reaches down/critical after _CONFIRM_FAILS consecutive
+    bad cycles; until confirmed, the last known status is kept (or
+    "unknown" on cold start, so boot doesn't flash red). Any good cycle
+    resets the counter and takes effect immediately — recovery is never
+    delayed, only alarms are.
+    """
+    entry = damp.setdefault(target, {"fails": 0, "confirmed": "unknown"})
+    if raw_status in ("down", "critical"):
+        entry["fails"] += 1
+        if entry["fails"] >= _CONFIRM_FAILS:
+            entry["confirmed"] = raw_status
+    else:
+        entry["fails"] = 0
+        entry["confirmed"] = raw_status
+    return entry["confirmed"]
 
 
 # ─── Service check dispatch ───────────────────────────────────────────────────
@@ -107,12 +133,15 @@ async def _check_service(svc: ServiceDef, timeout: float) -> dict:
 
 # ─── Per-server collector ─────────────────────────────────────────────────────
 
-async def _collect_server(srv, state: dict, settings: Settings, do_metrics: bool) -> None:
+async def _collect_server(
+    srv, state: dict, settings: Settings, do_metrics: bool, damp: dict
+) -> None:
     """Collect all data for one server and update state[srv.name].
 
     HTTP service checks run on every cycle; SSH metrics + Docker only
     when `do_metrics` is True (poll_interval_metrics elapsed) — otherwise
-    the last collected values are kept.
+    the last collected values are kept. All down/critical statuses pass
+    through flap damping before they are published.
     """
     name = srv.name
     prev = state.get(name, {})
@@ -141,6 +170,12 @@ async def _collect_server(srv, state: dict, settings: Settings, do_metrics: bool
         else:
             services.append(result)
 
+    # Flap damping: publish confirmed status; keep raw for debugging
+    for svc in services:
+        raw = svc.get("status", "unknown")
+        svc.setdefault("extra", {})["raw_status"] = raw
+        svc["status"] = dampen_status(f"{name}/{svc['name']}", raw, damp)
+
     state.setdefault(name, {})["services"] = services
 
     # --- SSH metrics + Docker (only when the metrics interval elapsed)
@@ -161,7 +196,10 @@ async def _collect_server(srv, state: dict, settings: Settings, do_metrics: bool
         # keep last good metrics so the card doesn't zero out on a blip
         state[name].setdefault("metrics", metrics)
         state[name]["agent_last_seen"] = prev.get("agent_last_seen", "")
-    state[name]["agent_reachable"] = ssh_ok
+    # Damped: one SSH blip (public internet to SUIG/OIC) must not flip
+    # the whole server card to DOWN — require 2 consecutive failures.
+    agent_confirmed = dampen_status(f"{name}/__agent__", "ok" if ssh_ok else "down", damp)
+    state[name]["agent_reachable"] = agent_confirmed != "down"
     state[name]["stale"] = not ssh_ok
 
     docker = await collect_docker(
@@ -277,7 +315,10 @@ def _manage_incidents(state: dict, prev_services: dict, db) -> None:
                 )
                 log.warning("INCIDENT OPEN: %s", summary)
 
-            elif cur_status == "ok" and old_status in ("down", "critical"):
+            elif cur_status in ("ok", "warning") and old_status in ("down", "critical"):
+                # Resolve as soon as the service is available again — a
+                # service that recovers into "warning" (e.g. slow but up)
+                # must not keep its incident open forever.
                 incident_resolve_by_target(db, "service", target_name)
                 log.info("INCIDENT RESOLVED: %s", target_name)
 
@@ -291,6 +332,7 @@ async def run_scheduler(app_state, db, settings: Settings) -> None:
     """
     state: dict = {}
     prev_services: dict = {}
+    damp: dict = {}  # flap-damping counters, keyed "server/service"
 
     last_metrics = 0.0
     last_ssl = 0.0
@@ -313,7 +355,9 @@ async def run_scheduler(app_state, db, settings: Settings) -> None:
             do_ssl = (now - last_ssl) >= settings.poll_interval_ssl
             do_dns = (now - last_dns) >= settings.poll_interval_dns
 
-            server_tasks = [_collect_server(srv, state, settings, do_metrics) for srv in SERVERS]
+            server_tasks = [
+                _collect_server(srv, state, settings, do_metrics, damp) for srv in SERVERS
+            ]
             await asyncio.gather(*server_tasks, return_exceptions=True)
 
             if do_metrics:
