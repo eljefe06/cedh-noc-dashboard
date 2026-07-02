@@ -107,8 +107,13 @@ async def _check_service(svc: ServiceDef, timeout: float) -> dict:
 
 # ─── Per-server collector ─────────────────────────────────────────────────────
 
-async def _collect_server(srv, state: dict, settings: Settings) -> None:
-    """Collect all data for one server and update state[srv.name]."""
+async def _collect_server(srv, state: dict, settings: Settings, do_metrics: bool) -> None:
+    """Collect all data for one server and update state[srv.name].
+
+    HTTP service checks run on every cycle; SSH metrics + Docker only
+    when `do_metrics` is True (poll_interval_metrics elapsed) — otherwise
+    the last collected values are kept.
+    """
     name = srv.name
     prev = state.get(name, {})
 
@@ -138,18 +143,26 @@ async def _collect_server(srv, state: dict, settings: Settings) -> None:
 
     state.setdefault(name, {})["services"] = services
 
-    # --- SSH metrics + Docker (run every METRICS interval)
+    # --- SSH metrics + Docker (only when the metrics interval elapsed)
+    if not do_metrics:
+        return
+
     metrics = await collect_metrics(
         srv.ssh_host,
         srv.ssh_user,
         key_path=settings.ssh_key_path,
         timeout=settings.ssh_timeout_seconds,
     )
-    agent_reachable = metrics.error is None
-    state[name]["metrics"] = metrics
-    state[name]["agent_reachable"] = agent_reachable
-    state[name]["agent_last_seen"] = _now() if agent_reachable else prev.get("agent_last_seen", "")
-    state[name]["stale"] = not agent_reachable
+    ssh_ok = metrics.error is None
+    if ssh_ok:
+        state[name]["metrics"] = metrics
+        state[name]["agent_last_seen"] = _now()
+    else:
+        # keep last good metrics so the card doesn't zero out on a blip
+        state[name].setdefault("metrics", metrics)
+        state[name]["agent_last_seen"] = prev.get("agent_last_seen", "")
+    state[name]["agent_reachable"] = ssh_ok
+    state[name]["stale"] = not ssh_ok
 
     docker = await collect_docker(
         srv.ssh_host,
@@ -157,12 +170,16 @@ async def _collect_server(srv, state: dict, settings: Settings) -> None:
         key_path=settings.ssh_key_path,
         timeout=settings.ssh_timeout_seconds,
     )
-    state[name]["docker"] = docker if docker.available else None
+    if docker.available:
+        state[name]["docker"] = docker
+    else:
+        # keep last good docker snapshot on a transient SSH failure
+        state[name].setdefault("docker", None)
 
     log.debug(
         "server %s: agent=%s cpu=%.1f ram=%.1f services=%d",
         name,
-        agent_reachable,
+        ssh_ok,
         metrics.cpu_percent,
         metrics.ram_percent,
         len(services),
@@ -288,15 +305,15 @@ async def run_scheduler(app_state, db, settings: Settings) -> None:
         cycle_start = now
 
         # ── HTTP service checks (fastest interval) ────────────────────────
-        # Run all servers concurrently (services only; skip SSH metrics on this path
-        # if the metrics interval hasn't elapsed)
+        # Run all servers concurrently. SSH metrics/Docker only piggyback
+        # when their (slower) interval elapsed — SSHing every HTTP cycle
+        # hammers the monitored VPS and multiplies transient failures.
         try:
-            # Services + metrics if due
             do_metrics = (now - last_metrics) >= settings.poll_interval_metrics
             do_ssl = (now - last_ssl) >= settings.poll_interval_ssl
             do_dns = (now - last_dns) >= settings.poll_interval_dns
 
-            server_tasks = [_collect_server(srv, state, settings) for srv in SERVERS]
+            server_tasks = [_collect_server(srv, state, settings, do_metrics) for srv in SERVERS]
             await asyncio.gather(*server_tasks, return_exceptions=True)
 
             if do_metrics:
